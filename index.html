@@ -83,6 +83,36 @@
   .stat-highlight .row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--line); font-size:.86em}
   .stat-highlight .row:last-child{border-bottom:none}
   .trophy-icon{width:68px; height:68px; border-radius:50%; object-fit:cover; vertical-align:-16px; margin-right:10px; box-shadow:0 0 18px rgba(255,201,77,.5)}
+  /* ---- XI Ideal ---- */
+  .pitch{
+    background:#2d9a4e;
+    background-image:
+      repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0px, rgba(255,255,255,.04) 40px, transparent 40px, transparent 80px);
+    border:3px solid rgba(255,255,255,.3); border-radius:12px;
+    position:relative; max-width:540px; margin:0 auto; padding-bottom:62%;
+    pointer-events:none;
+  }
+  .pitch::before,.pitch::after{content:'';position:absolute;left:50%;transform:translateX(-50%);border:2px solid rgba(255,255,255,.25);pointer-events:none}
+  .pitch::before{width:40%;height:22%;top:0;border-top:none;border-radius:0 0 8px 8px}
+  .pitch::after{width:40%;height:22%;bottom:0;border-bottom:none;border-radius:8px 8px 0 0}
+  .pitch-row{position:absolute;left:0;right:0;display:flex;justify-content:space-around;align-items:center}
+  .xi-player{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform .15s;pointer-events:auto}
+  .xi-player .xi-shirt{pointer-events:auto}
+  .xi-player:hover{transform:scale(1.08)}
+  .xi-shirt{
+    width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.3em;border:2px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.4)
+  }
+  .xi-name{font-size:.58em;color:#fff;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.8);max-width:64px;line-height:1.2;font-weight:700}
+  .xi-country{font-size:.52em;color:rgba(255,255,255,.75);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+  .xi-card{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 18px;max-width:480px;margin:16px auto 0;
+  }
+  .xi-card h4{margin:0 0 6px;color:var(--gold);font-family:var(--display);letter-spacing:.03em}
+  .xi-card p{margin:0;font-size:.78em;color:var(--muted);line-height:1.5}
+  .pitch-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:80px;height:80px;border-radius:50%;border:2px solid rgba(255,255,255,.2);pointer-events:none}
   .page-brand{
     text-align:center; margin:24px auto 4px; padding-top:10px; border-top:1px dashed var(--line);
     max-width:300px; font-size:.68em; color:var(--muted); font-weight:700; letter-spacing:.04em;
@@ -430,6 +460,7 @@
   <button class="tab-btn" data-view="calendar" onclick="showView('calendar')">Calendario</button>
   <button class="tab-btn" data-view="general" onclick="showView('general')">Lista General</button>
   <button class="tab-btn" data-view="stats" onclick="showView('stats')">El Mundial en Números</button>
+  <button class="tab-btn" data-view="bestxi" onclick="showView('bestxi')">XI Ideal</button>
 </div>
 
 <div id="groups" class="view active">
@@ -491,6 +522,16 @@
   <div class="note" style="margin-bottom:14px">Un resumen del torneo hasta este corte, calculado automáticamente con todos los partidos cargados.</div>
   <div class="stats-grid" id="statsGrid"></div>
   <div id="statsExtra" style="max-width:900px;margin:20px auto 0"></div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="bestxi" class="view">
+  <div class="note" style="margin-bottom:18px">XI Ideal de la Fase de Grupos según <b>Opta Analyst</b> (Stats Perform) — basado en datos estadísticos objetivos de los 72 partidos de la fase de grupos. Formación 4-3-3.</div>
+  <div id="bestXiPitch"></div>
+  <div class="xi-card" id="xiDetail" style="display:none">
+    <h4 id="xiDetailTitle"></h4>
+    <p id="xiDetailNote"></p>
+  </div>
   <div class="page-brand">⚽ <b>Chango's Data</b></div>
 </div>
 
@@ -664,15 +705,11 @@ function toggleTheme(){
   document.getElementById('themeToggle').innerText = isLight ? '🌙' : '☀️';
 }
 
-const TODAY_REF = "2 jul";
-const LAST_UPDATE = "1 de julio de 2026 — P80 Inglaterra 2-1 RD Congo · P81 EEUU 2-0 Bosnia · P82 Bélgica 3-2 Senegal (AET)";
+const TODAY_REF = "3 jul";
+const LAST_UPDATE = "2 de julio de 2026 — P83 Portugal 2-1 Croacia · P84 España 3-0 Austria · P85 Suiza 2-0 Argelia";
 document.getElementById('updateBadge').innerHTML = `<span class="dot"></span> Última actualización: ${LAST_UPDATE}`;
 const calendarData = [
-  {date:"2 jul", phase:"Dieciseisavos", matches:[
-    {p:"P83", a:"Portugal",b:"Croacia",venue:"Estadio Toronto"},
-    {p:"P84", a:"España",b:"Austria",venue:"Estadio Los Ángeles"},
-    {p:"P85", a:"Suiza",b:"Argelia",venue:"Estadio Vancouver"},
-  ]},
+
   {date:"3 jul", phase:"Dieciseisavos", matches:[
     {p:"P86", a:"Argentina",b:"Cabo Verde",venue:"Estadio Miami"},
     {p:"P87", a:"Colombia",b:"Ghana",venue:"Estadio Kansas City"},
@@ -687,12 +724,12 @@ const calendarData = [
     {p:"P92", a:"México",b:"Inglaterra",venue:"Estadio Ciudad de México"},
   ]},
   {date:"6 jul", phase:"Octavos de final", matches:[
-    {p:"P93", a:"Gan. P83 (Portugal/Croacia)",b:"Gan. P84 (España/Austria)",venue:"Estadio Dallas"},
+    {p:"P93", a:"Portugal",b:"España",venue:"Estadio Dallas"},
     {p:"P94", a:"Estados Unidos",b:"Bélgica",venue:"Estadio Seattle"},
   ]},
   {date:"7 jul", phase:"Octavos de final", matches:[
     {p:"P95", a:"Gan. P86 (Argentina/Cabo Verde)",b:"Gan. P88 (Australia/Egipto)",venue:"Estadio Atlanta"},
-    {p:"P96", a:"Gan. P85 (Suiza/Argelia)",b:"Gan. P87 (Colombia/Ghana)",venue:"Estadio Vancouver"},
+    {p:"P96", a:"Suiza",b:"Gan. P87 (Colombia/Ghana)",venue:"Estadio Vancouver"},
   ]},
   {date:"9 jul", phase:"Cuartos de final", matches:[
     {p:"P97", a:"Gan. P89",b:"Gan. P90",venue:"Estadio Boston"},
@@ -708,6 +745,81 @@ const calendarData = [
   {date:"18 jul", phase:"3er puesto", matches:[{p:"3P", a:"Perdedor SF1",b:"Perdedor SF2",venue:"Estadio Miami"}]},
   {date:"19 jul", phase:"FINAL", matches:[{p:"F", a:"Ganador SF1",b:"Ganador SF2",venue:"Estadio Nueva York Nueva Jersey"}]},
 ];
+
+// ---- XI Ideal Fase de Grupos (Opta Analyst / Stats Perform) ----
+const bestXI = {
+  source: "Opta Analyst (Stats Perform)",
+  date: "Fase de Grupos · 28 jun 2026",
+  formation: "4-3-3",
+  players: [
+    {pos:"GK", name:"Vozinha", photo:"Vozinha Cape Verde Goalkeeper.jpg", country:"Cabo Verde", flag:"🇨🇻", shirt:"#f59e0b",
+     note:"Guardó 1.4 goles sobre lo esperado. 2do mejor 'goals prevented'. 40 años."},
+    {pos:"RB", name:"Marvin Senaya", country:"Ghana", flag:"🇬🇭", shirt:"#ef4444",
+     note:"Más intentos de tackle (18). 24/38 duelos ganados. Anuló a Anthony Gordon."},
+    {pos:"CB", name:"Diney Borges", country:"Cabo Verde", flag:"🇨🇻", shirt:"#f59e0b",
+     note:"31 despejes (2do entre defensas). 68% de duelos ganados. 8 tackles."},
+    {pos:"CB", name:"Pau Cubarsí", photo:"Pau-Cubarsi.jpg", country:"España", flag:"🇪🇸", shirt:"#ef4444",
+     note:"19 años. Solo 5 pases errados de 294 intentos. 39 pases de ruptura de línea."},
+    {pos:"LB", name:"Keito Nakamura", country:"Japón", flag:"🇯🇵", shirt:"#3b82f6",
+     note:"Gol + asistencia. 5/7 regates completados. 9 intervenciones en tiro."},
+    {pos:"CM", name:"Weston McKennie", photo:"2022 FIFA World Cup England 0-0 USA - Weston McKennie.jpg", country:"EE.UU.", flag:"🇺🇸", shirt:"#3b82f6",
+     note:"7 chances creadas en juego abierto (3ro entre mediocampistas)."},
+    {pos:"CM", name:"Pedro Vite", photo:"Pedro Vite Cote D'Ivoire v Ecuador 14 June 2026-42.jpg", country:"Ecuador", flag:"🇪🇨", shirt:"#f59e0b",
+     note:"8 chances creadas (2do entre mediocampistas). 29 recuperaciones."},
+    {pos:"CM", name:"Lionel Messi", country:"Argentina", flag:"🇦🇷", shirt:"#60a5fa", photo:"Lionel Messi 20180626.jpg",
+     note:"6 goles · 1er jugador en marcar en 7 partidos seguidos en Mundiales."},
+    {pos:"LW", name:"Vinícius Jr.", country:"Brasil", flag:"🇧🇷", shirt:"#f59e0b", photo:"Vinicius Jr 2021.jpg",
+     note:"4 goles · 5to brasileño en anotar en los 3 partidos del grupo."},
+    {pos:"ST", name:"Erling Haaland", photo:"Erling-Haaland-2023.jpg", country:"Noruega", flag:"🇳🇴", shirt:"#ef4444",
+     note:"4 goles · 2.68 xG (2do del torneo). Conversión 40%."},
+    {pos:"RW", name:"Kylian Mbappé", photo:"Kylian Mbappé France.jpg", country:"Francia", flag:"🇫🇷", shirt:"#3b82f6",
+     note:"4 goles + 2 asistencias · 4to en marcar 2+ goles en 3 partidos consecutivos de Mundiales."},
+  ]
+};
+
+function renderBestXI(){
+  const pitch = document.getElementById('bestXiPitch');
+
+  // 4-3-3: GK / 4 DEF / 3 MID / 3 FW
+  const rows = [
+    {top:'7%',  idxs:[0]},
+    {top:'28%', idxs:[1,2,3,4]},
+    {top:'53%', idxs:[5,6,7]},
+    {top:'78%', idxs:[8,9,10]},
+  ];
+
+  let html = '<div class="pitch"><div class="pitch-label"></div>';
+  rows.forEach(row=>{
+    html += `<div class="pitch-row" style="top:${row.top}">`;
+    row.idxs.forEach(i=>{
+      const p = bestXI.players[i];
+      const bg = p.photo
+        ? `background:${p.shirt} url('${stadiumPhotoUrl(p.photo)}') center top/cover no-repeat`
+        : `background:${p.shirt}`;
+      html += `<div class="xi-player" onclick="openXiDetail(${i})">
+        <div class="xi-shirt" style="${bg}" onclick="openXiDetail(${i})">${p.photo ? '' : p.flag}</div>
+        <div class="xi-name">${p.name}</div>
+        <div class="xi-country">${p.pos} · ${p.country}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += `<p style="text-align:center;font-size:.72em;color:var(--muted);margin-top:14px">
+    Fuente: <b>Opta Analyst</b> · ${bestXI.date} · Formación ${bestXI.formation} · Clic en un jugador para ver los stats
+  </p>`;
+
+  pitch.innerHTML = html;
+}function openXiDetail(i){
+  const p = bestXI.players[i];
+  document.getElementById('xiDetailTitle').innerHTML =
+    `${p.flag} ${p.name} <span style="color:var(--muted);font-size:.7em;font-family:var(--body)">${p.pos} · ${p.country}</span>`;
+  document.getElementById('xiDetailNote').textContent = p.note;
+  const card = document.getElementById('xiDetail');
+  card.style.display = 'block';
+  try { card.scrollIntoView({behavior:'smooth', block:'nearest'}); } catch(e) {}
+}
 
 function renderWorldCupStats(){
   // Deduplicar partidos: la clave es SOLO el par de equipos (cada par juega una sola vez en esta fase),
@@ -991,6 +1103,19 @@ function openH2H(a,b){
   } else {
     body += `<div class="pending">Sin ránking cargado para alguno de los dos equipos.</div>`;
   }
+  // Link YouTube si el partido ya se jugó (buscamos en R32)
+  const r32match = R32.find(m=> (m.a===a&&m.b===b)||(m.a===b&&m.b===a));
+  if(r32match && r32match.played){
+    const ytQ = encodeURIComponent(r32match.id+' '+a+' vs '+b+' Mundial 2026 resumen');
+    body += `<div style="margin-top:14px;text-align:center">
+      <a href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener"
+         style="display:inline-block;background:var(--card-hi);border:1px solid var(--gold);color:var(--gold);
+                padding:7px 18px;border-radius:999px;font-size:.8em;text-decoration:none;font-weight:700">
+        ▶ Ver resumen del partido en YouTube
+      </a>
+      <div style="font-size:.68em;color:var(--muted);margin-top:5px">Abre una búsqueda en YouTube del resumen oficial del partido</div>
+    </div>`;
+  }
   document.getElementById('h2hBody').innerHTML = body;
   document.getElementById('h2hModalBg').classList.add('active');
 }
@@ -1015,8 +1140,8 @@ const R32 = [
   {id:'P77', a:'Francia', b:'Suecia', result:'3-0', winner:'Francia', played:true},
   {id:'P73', a:'Sudáfrica', b:'Canadá', result:'0-1', winner:'Canadá', played:true},
   {id:'P75', a:'Países Bajos', b:'Marruecos', result:'1-1 (2-3p)', winner:'Marruecos', played:true},
-  {id:'P83', a:'Portugal', b:'Croacia', played:false},
-  {id:'P84', a:'España', b:'Austria', played:false},
+  {id:'P83', a:'Portugal', b:'Croacia', result:'2-1', winner:'Portugal', played:true},
+  {id:'P84', a:'España', b:'Austria', result:'3-0', winner:'España', played:true},
   {id:'P81', a:'Estados Unidos', b:'Bosnia y Herzegovina', result:'2-0', winner:'Estados Unidos', played:true},
   {id:'P82', a:'Bélgica', b:'Senegal', result:'3-2 AET', winner:'Bélgica', played:true},
   {id:'P76', a:'Brasil', b:'Japón', result:'2-1', winner:'Brasil', played:true},
@@ -1025,7 +1150,7 @@ const R32 = [
   {id:'P80', a:'Inglaterra', b:'RD Congo', result:'2-1', winner:'Inglaterra', played:true},
   {id:'P86', a:'Argentina', b:'Cabo Verde', played:false},
   {id:'P88', a:'Australia', b:'Egipto', played:false},
-  {id:'P85', a:'Suiza', b:'Argelia', played:false},
+  {id:'P85', a:'Suiza', b:'Argelia', result:'2-0', winner:'Suiza', played:true},
   {id:'P87', a:'Colombia', b:'Ghana', played:false},
 ];
 const R16_IDS = ['P89','P90','P93','P94','P91','P92','P95','P96'];
@@ -1169,7 +1294,7 @@ function renderGroupsTable(){
   });
 }
 
-const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats'];
+const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats','bestxi'];
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1721,9 +1846,12 @@ const teamDetails = {
      goles:[["10'","⚽ Lamine Yamal (ESP)"],["21'","⚽ Mikel Oyarzabal (ESP)"],["24'","⚽ Mikel Oyarzabal (ESP)"],
              ["49'","⚽ Hassan Al-Tambakti (autogol, KSA)"]], tarjetas:[["30'","🟨 Salem Al-Dawsari (KSA)"],["59'","🟨 Mohamed Kanno (KSA)"]]},
     {rival:"Uruguay", marcador:"1-0", estadio:"Estadio Akron, Guadalajara", arbitro:"por confirmar",
-     goles:[["41'","⚽ Álex Baena (ESP)"]], tarjetas:[["54'","🟨 Juan Manuel Sanabria (URU)"],["~","🟨 Guillermo Varela (URU)"]]}
+     goles:[["41'","⚽ Álex Baena (ESP)"]], tarjetas:[["54'","🟨 Juan Manuel Sanabria (URU)"],["~","🟨 Guillermo Varela (URU)"]]},
+    {rival:"Austria", marcador:"3-0", estadio:"SoFi Stadium, Los Ángeles", arbitro:"por confirmar",
+     goles:[["36'","⚽ Mikel Oyarzabal (ESP)"],["66'","⚽ Pedro Porro (ESP, cabezazo)"],["89'","⚽ Mikel Oyarzabal (ESP, doblete)"]],
+     tarjetas:[]}
   ],
-  matchesNote:"España termina líder del Grupo H con 7 pts y clasifica a dieciseisavos.",
+  matchesNote:"España clasifica a octavos de final con portería invicta en todo el torneo. Espera al ganador de Portugal-Croacia.",
   plantel:[["Unai Simón","GK"],["David Raya","GK"],["Joan García","GK"],
    ["Marc Llorente","DF"],["Pedro Porro","DF"],["Eric García","DF"],["Jesús Pubill","DF"],["Aymeric Laporte","DF"],["Pau Cubarsí","DF"],["Marc Cucurella","DF"],["Álex Grimaldo","DF"],
    ["Pedri","MC"],["Fabián Ruiz","MC"],["Martín Zubimendi","MC"],["Gavi","MC"],["Rodri Hernández","MC"],["Álex Baena","MC"],["Mikel Merino","MC"],
@@ -1870,9 +1998,11 @@ const teamDetails = {
     {rival:"Austria", marcador:"3-3", estadio:"Arrowhead Stadium, Kansas City", arbitro:"por confirmar",
      goles:[["28'","⚽ Marko Arnautović (AUT)"],["45'","⚽ Rafik Belghali (ALG)"],["55'","⚽ Marcel Sabitzer (AUT)"],
              ["60'","⚽ Riyad Mahrez (ALG)"],["90+3'","⚽ Riyad Mahrez (ALG) — doblete"],["90+5'","⚽ Sasa Kalajdzic (AUT)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"Suiza", marcador:"0-2", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
+     goles:[], tarjetas:[]}
   ],
-  matchesNote:"Argelia clasifica a dieciseisavos tras el agónico empate 3-3 con Austria.",
+  matchesNote:"Argelia queda eliminada en dieciseisavos ante Suiza.",
   plantel:[["Luca Zidane","GK"],["Oussama Benbot","GK"],["Melvin Mastil","GK"],
    ["Rafik Belghali","DF"],["Samir Chergui","DF"],["Rayan Aït-Nouri","DF"],["Jaouen Hadjam","DF"],["Aissa Mandi","DF"],["Ramy Bensebaini","DF"],["Zineddine Belaid","DF"],["Achref Abada","DF"],["Mohamed Amine Tougai","DF"],
    ["Nabil Bentaleb","MC"],["Hicham Boudaoui","MC"],["Houssem Aouar","MC"],["Farès Chaibi","MC"],["Ibrahim Maza","MC"],["Yacine Titraoui","MC"],["Ramiz Zerrouki","MC"],
@@ -1889,9 +2019,11 @@ const teamDetails = {
     {rival:"Argelia", marcador:"3-3", estadio:"Arrowhead Stadium, Kansas City", arbitro:"por confirmar",
      goles:[["28'","⚽ Marko Arnautović (AUT)"],["45'","⚽ Rafik Belghali (ALG)"],["55'","⚽ Marcel Sabitzer (AUT)"],
              ["60'","⚽ Riyad Mahrez (ALG)"],["90+3'","⚽ Riyad Mahrez (ALG) — doblete"],["90+5'","⚽ Sasa Kalajdzic (AUT)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"España", marcador:"0-3", estadio:"SoFi Stadium, Los Ángeles", arbitro:"por confirmar",
+     goles:[], tarjetas:[["~","🟨 Stefan Posch (AUT)"]]}
   ],
-  matchesNote:"Austria clasifica a dieciseisavos tras el agónico empate 3-3 con Argelia.",
+  matchesNote:"Austria queda eliminada en dieciseisavos sin poder inquietar a España.",
   plantel:[["Alexander Schlager","GK"],["Patrick Pentz","GK"],["Florian Wiegele","GK"],
    ["David Alaba","DF"],["Kevin Danso","DF"],["Marco Friedl","DF"],["Philipp Lienhart","DF"],["Philipp Mwene","DF"],["Stefan Posch","DF"],["Alexander Prass","DF"],["Michael Svoboda","DF"],
    ["Konrad Laimer","MC"],["Marcel Sabitzer","MC"],["Xaver Schlager","MC"],["Carney Chukwuemeka","MC"],["Paul Wanner","MC"],["Romano Schmid","MC"],["Nicolas Seiwald","MC"],["Florian Grillitsch","MC"],["Patrick Wimmer","MC"],["Christoph Baumgartner","MC"],["David Affengruber","MC"],
@@ -1924,9 +2056,12 @@ const teamDetails = {
              ["38'","⚽ Cristiano Ronaldo (POR) — 10º gol histórico en Mundiales, supera a Eusébio"],["60'","⚽ Abdukodir Khusanov (autogol, UZB)"],
              ["87'","⚽ Rafael Leão (POR)"]], tarjetas:[]},
     {rival:"Colombia", marcador:"0-0", estadio:"Estadio Miami (Hard Rock)", arbitro:"por confirmar",
-     goles:[], tarjetas:[]}
+     goles:[], tarjetas:[]},
+    {rival:"Croacia", marcador:"2-1", estadio:"BMO Field, Toronto", arbitro:"por confirmar",
+     goles:[["~","⚽ Ivan Perišić (CRO)"],["~","⚽ Cristiano Ronaldo (POR, penal)"],["90+'","⚽ Gonçalo Ramos (POR)"]],
+     tarjetas:[]}
   ],
-  matchesNote:"Portugal clasifica 2do del Grupo K con 5 pts.",
+  matchesNote:"Portugal avanza a octavos de final. Enfrentará a España.",
   plantel:[["Diogo Costa","GK"],["José Sá","GK"],["Rui Patrício","GK"],
    ["João Cancelo","DF"],["Rúben Dias","DF"],["Nuno Mendes","DF"],["Gonçalo Inácio","DF"],["Diogo Dalot","DF"],["Nélson Semedo","DF"],["Tomás Araújo","DF"],["António Silva","DF"],
    ["Vitinha","MC"],["João Neves","MC"],["Bruno Fernandes","MC"],["Bernardo Silva","MC"],["Matheus Nunes","MC"],["Rúben Neves","MC"],["João Palhinha","MC"],
@@ -2014,9 +2149,11 @@ const teamDetails = {
      goles:[["54'","⚽ Ante Budimir (CRO)"]], tarjetas:[]},
     {rival:"Ghana", marcador:"2-1", estadio:"Estadio Filadelfia", arbitro:"por confirmar",
      goles:[["31'","⚽ Petar Sučić (CRO)"],["73'","⚽ Derrick Luckassen (GHA), asistencia de Ernest Nuamah"],
-             ["83'","⚽ Nikola Vlašić (CRO)"]], tarjetas:[]}
+             ["83'","⚽ Nikola Vlašić (CRO)"]], tarjetas:[]},
+    {rival:"Portugal", marcador:"1-2", estadio:"BMO Field, Toronto", arbitro:"por confirmar",
+     goles:[["~","⚽ Ivan Perišić (CRO)"]], tarjetas:[]}
   ],
-  matchesNote:"Croacia clasifica 2do del Grupo L con 6 pts.",
+  matchesNote:"Croacia queda eliminada. Es el último Mundial de Luka Modrić.",
   plantel:[["Dominik Livaković","GK"],["Dominik Kotarski","GK"],["Ivor Pandur","GK"],
    ["Josko Gvardiol","DF"],["Luka Vušković","DF"],["Josip Šutalo","DF"],["Domagoj Bradarić","DF"],["Marin Pongračić","DF"],["Josip Stanišić","DF"],["Josko Vušković","DF"],
    ["Luka Modrić","MC"],["Mateo Kovačić","MC"],["Mario Pašalić","MC"],["Nikola Vlašić","MC"],["Luka Sučić","MC"],["Martin Baturina","MC"],["Kristijan Jakić","MC"],["Petar Sučić","MC"],["Nikola Moro","MC"],["Toni Fruk","MC"],
@@ -2829,7 +2966,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:8},{year:1998,rank:7},{year:2002,rank:3},{year:2006,rank:4},{year:2010,rank:6},{year:2014,rank:2},{year:2018,rank:5},{year:2022,rank:4},{year:2026,rank:2}]
 },
 "Argelia":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1982,
   bestShort:"Octavos de final",
   bestResult:"Octavos de final",
@@ -2843,7 +2980,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:48},{year:1998,rank:58},{year:2002,rank:79},{year:2018,rank:66},{year:2026,rank:35}]
 },
 "Austria":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1934,
   bestShort:"Tercer puesto",
   bestResult:"Tercer puesto",
@@ -2953,7 +3090,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:15},{year:1998,rank:5},{year:2002,rank:12},{year:2018,rank:12},{year:2026,rank:4}]
 },
 "Croacia":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1998,
   bestShort:"Subcampeón",
   bestResult:"Subcampeón",
@@ -5651,7 +5788,7 @@ const scorersRanking = [
   {name:"Kai Havertz",team:"Alemania",goals:2,events:[{rival:"Curazao",minute:"45+5'",marcador:"7-1",estadio:"NRG Stadium, Houston"},{rival:"Curazao",minute:"88'",marcador:"7-1",estadio:"NRG Stadium, Houston"}]},
   {name:"Leandro Trossard",team:"Bélgica",goals:2,events:[{rival:"Nueva Zelanda",minute:"28'",marcador:"5-1",estadio:"BC Place, Vancouver"},{rival:"Nueva Zelanda",minute:"50'",marcador:"5-1",estadio:"BC Place, Vancouver"}]},
   {name:"Marko Arnautović",team:"Austria",goals:2,events:[{rival:"Jordania",minute:"66'",marcador:"3-1",estadio:"Estadio de la Bahía de San Francisco (Santa Clara)"},{rival:"Jordania",minute:"90+10'",marcador:"3-1",estadio:"Estadio de la Bahía de San Francisco (Santa Clara)"}]},
-  {name:"Mikel Oyarzabal",team:"España",goals:2,events:[{rival:"Arabia Saudí",minute:"21'",marcador:"4-0",estadio:"Estadio de Atlanta (Mercedes-Benz)"},{rival:"Arabia Saudí",minute:"24'",marcador:"4-0",estadio:"Estadio de Atlanta (Mercedes-Benz)"}]},
+  {name:"Mikel Oyarzabal",team:"España",photo:"Mikel Oyarzabal.jpg",goals:4,events:[{rival:"Arabia Saudí",minute:"21'",marcador:"4-0",estadio:"Estadio de Atlanta (Mercedes-Benz)"},{rival:"Arabia Saudí",minute:"24'",marcador:"4-0",estadio:"Estadio de Atlanta (Mercedes-Benz)"},{rival:"Austria",minute:"36'",marcador:"3-0",estadio:"SoFi Stadium, Los Ángeles"},{rival:"Austria",minute:"89'",marcador:"3-0",estadio:"SoFi Stadium, Los Ángeles"}]},
   {name:"Nicolas Pépé",team:"Costa de Marfil",goals:2,events:[{rival:"Curazao",minute:"7'",marcador:"2-0",estadio:"Estadio Filadelfia"},{rival:"Curazao",minute:"64'",marcador:"2-0",estadio:"Estadio Filadelfia"}]},
   {name:"Pape Gueye",team:"Senegal",goals:2,events:[{rival:"Irak",minute:"59'",marcador:"5-0",estadio:"Estadio de Toronto (BMO Field)"},{rival:"Irak",minute:"71'",marcador:"5-0",estadio:"Estadio de Toronto (BMO Field)"}]},
   {name:"Riyad Mahrez",team:"Argelia",goals:2,events:[{rival:"Austria",minute:"60'",marcador:"3-3",estadio:"Arrowhead Stadium, Kansas City"},{rival:"Austria",minute:"90+3'",marcador:"3-3",estadio:"Arrowhead Stadium, Kansas City"}]},
@@ -6050,6 +6187,7 @@ renderFavBar();
 renderCalendar();
 renderGeneralStandings();
 renderWorldCupStats();
+renderBestXI();
 
 function onSearchInput(q){
   const box = document.getElementById('searchResults');
