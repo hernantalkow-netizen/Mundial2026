@@ -113,6 +113,22 @@
   .xi-card p{margin:0;font-size:.78em;color:var(--muted);line-height:1.5}
   .pitch-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
     width:80px;height:80px;border-radius:50%;border:2px solid rgba(255,255,255,.2);pointer-events:none}
+  .curio-item{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;max-width:760px;margin-left:auto;margin-right:auto}
+  .curio-head{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;cursor:pointer;font-weight:700;font-size:.95em;transition:background .15s}
+  .curio-head:hover{background:var(--card-hi)}
+  .curio-arrow{color:var(--gold);font-size:1.1em}
+  .curio-body{padding:0 16px 14px}
+  .curio-body p{margin:0 0 10px;color:var(--muted);font-size:.86em;line-height:1.55}
+  .curio-links{display:flex;gap:10px;flex-wrap:wrap}
+  .curio-links a{display:inline-block;background:var(--card-hi);border:1px solid var(--gold);color:var(--gold);padding:5px 14px;border-radius:999px;font-size:.78em;text-decoration:none;font-weight:700}
+  .cf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;margin-bottom:12px}
+  .cf-grid div{background:var(--card-hi);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+  .cf-grid b{display:block;font-size:1.15em;color:var(--gold)}
+  .cf-grid span{font-size:.68em;color:var(--muted)}
+  .cf-teams{display:flex;flex-wrap:wrap;gap:6px}
+  .cf-team{font-size:.76em;padding:3px 9px;border-radius:999px;background:var(--card-hi);border:1px solid var(--line);color:var(--muted)}
+  .cf-team.activo{border-color:var(--turf);color:var(--turf);font-weight:700}
+  .cf-team.elim{opacity:.55}
   .page-brand{
     text-align:center; margin:24px auto 4px; padding-top:10px; border-top:1px dashed var(--line);
     max-width:300px; font-size:.68em; color:var(--muted); font-weight:700; letter-spacing:.04em;
@@ -461,6 +477,9 @@
   <button class="tab-btn" data-view="general" onclick="showView('general')">Lista General</button>
   <button class="tab-btn" data-view="stats" onclick="showView('stats')">El Mundial en Números</button>
   <button class="tab-btn" data-view="bestxi" onclick="showView('bestxi')">XI Ideal</button>
+  <button class="tab-btn" data-view="curios" onclick="showView('curios')">Curiosidades</button>
+  <button class="tab-btn" data-view="confed" onclick="showView('confed')">Confederaciones</button>
+  <button class="tab-btn" data-view="mapa" onclick="showView('mapa')">Mapa</button>
 </div>
 
 <div id="groups" class="view active">
@@ -532,6 +551,25 @@
     <h4 id="xiDetailTitle"></h4>
     <p id="xiDetailNote"></p>
   </div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="curios" class="view">
+  <div class="note" style="margin-bottom:16px">Las historias, récords y momentos insólitos que dejó el Mundial 2026. Tocá cada título para ver la nota y los enlaces a videos y medios.</div>
+  <div id="curiosList"></div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="confed" class="view">
+  <div class="note" style="margin-bottom:16px">Rendimiento de las 6 confederaciones en el Mundial 2026, calculado en vivo. Tocá una confederación para ver sus equipos.</div>
+  <div id="confedList"></div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="mapa" class="view">
+  <div class="note" style="margin-bottom:12px">Mapa mundial coloreado según la fase en que quedó eliminado cada país. Requiere conexión a internet.</div>
+  <div id="worldMap" style="max-width:900px;height:440px;margin:0 auto;position:relative"></div>
+  <div id="mapLegend" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px auto 0;font-size:.78em"></div>
   <div class="page-brand">⚽ <b>Chango's Data</b></div>
 </div>
 
@@ -705,18 +743,15 @@ function toggleTheme(){
   document.getElementById('themeToggle').innerText = isLight ? '🌙' : '☀️';
 }
 
-const TODAY_REF = "6 jul";
-const LAST_UPDATE = "5 de julio de 2026 — P91 Noruega 2-1 Brasil (Haaland ×2) · P92 Inglaterra 3-2 México";
+const TODAY_REF = "7 jul";
+const LAST_UPDATE = "6 de julio de 2026 — P93 España 1-0 Portugal (Merino 90+, adiós de CR7) · P94 Bélgica 4-1 EEUU";
 document.getElementById('updateBadge').innerHTML = `<span class="dot"></span> Última actualización: ${LAST_UPDATE}`;
 const calendarData = [
 
 
 
 
-  {date:"6 jul", phase:"Octavos de final", matches:[
-    {p:"P93", a:"Portugal",b:"España",venue:"Estadio Dallas"},
-    {p:"P94", a:"Estados Unidos",b:"Bélgica",venue:"Estadio Seattle"},
-  ]},
+
   {date:"7 jul", phase:"Octavos de final", matches:[
     {p:"P95", a:"Argentina",b:"Egipto",venue:"Estadio Atlanta"},
     {p:"P96", a:"Suiza",b:"Colombia",venue:"Estadio Vancouver"},
@@ -766,6 +801,111 @@ const bestXI = {
      note:"4 goles + 2 asistencias · 4to en marcar 2+ goles en 3 partidos consecutivos de Mundiales."},
   ]
 };
+
+// ---- Métricas por Confederación ----
+const CONFED_INFO = {
+  CONMEBOL:{nombre:"CONMEBOL",flag:"🌎",region:"Sudamérica"},
+  UEFA:{nombre:"UEFA",flag:"🇪🇺",region:"Europa"},
+  CAF:{nombre:"CAF",flag:"🌍",region:"África"},
+  AFC:{nombre:"AFC",flag:"🌏",region:"Asia"},
+  CONCACAF:{nombre:"CONCACAF",flag:"🌎",region:"Norte/Centroamérica"},
+  OFC:{nombre:"OFC",flag:"🏝️",region:"Oceanía"},
+};
+function scoreParts(m){ const p=m.marcador.split('(')[0].trim().split('-'); return p.length===2?[parseInt(p[0]),parseInt(p[1])]:null; }
+
+function renderConfed(){
+  const st={};
+  Object.entries(teamDetails).forEach(([team,d])=>{
+    const cf=d.confed; if(!cf) return;
+    if(!st[cf]) st[cf]={equipos:0,PJ:0,PG:0,PE:0,PP:0,GF:0,GC:0,YC:0,RC:0,teams:[]};
+    const s=st[cf]; s.equipos++;
+    const wch=worldCupHistory[team];
+    s.teams.push({team,flag:flags[team]||'🏳️',status: wch&&wch.qualified2026?'activo':(wch&&wch.eliminated2026?'elim':'?')});
+    const seen=new Set();
+    d.matches.forEach(m=>{
+      const pair=[team,m.rival].sort().join('|');
+      const sc=scoreParts(m); if(!sc) return;
+      if(!seen.has(pair)){ seen.add(pair); s.PJ++; s.GF+=sc[0]; s.GC+=sc[1];
+        if(sc[0]>sc[1])s.PG++; else if(sc[0]===sc[1])s.PE++; else s.PP++; }
+      m.tarjetas.forEach(t=>{ const k=pair+t[0]+t[1]; if(seen.has(k))return; seen.add(k);
+        if(t[1].includes('🟨'))s.YC++; if(t[1].includes('🟥'))s.RC++; });
+    });
+  });
+  // orden por PG desc
+  const order=Object.keys(st).sort((a,b)=>st[b].PG-st[a].PG||st[b].GF-st[a].GF);
+  const el=document.getElementById('confedList');
+  el.innerHTML=order.map(cf=>{
+    const s=st[cf], info=CONFED_INFO[cf]||{nombre:cf,flag:'🏳️',region:''};
+    const activos=s.teams.filter(t=>t.status==='activo').length;
+    const teamsHtml=s.teams.map(t=>`<span class="cf-team ${t.status}">${t.flag} ${t.team}${t.status==='activo'?' ✅':''}</span>`).join('');
+    return `<div class="curio-item">
+      <div class="curio-head" onclick="toggleCurio('cf${cf}')">
+        <span>${info.flag} ${info.nombre} <span style="color:var(--muted);font-weight:400;font-size:.82em">${info.region}</span></span>
+        <span class="curio-arrow" id="ca-cf${cf}">▾</span>
+      </div>
+      <div class="curio-body" id="cb-cf${cf}" style="display:none">
+        <div class="cf-grid">
+          <div><b>${s.equipos}</b><span>equipos</span></div>
+          <div><b>${activos}</b><span>siguen vivos</span></div>
+          <div><b>${s.PJ}</b><span>partidos</span></div>
+          <div><b>${s.PG}</b><span>ganados</span></div>
+          <div><b>${s.PE}</b><span>empates</span></div>
+          <div><b>${s.PP}</b><span>perdidos</span></div>
+          <div><b>${s.GF}</b><span>goles a favor</span></div>
+          <div><b>${s.GC}</b><span>goles en contra</span></div>
+          <div><b>🟨 ${s.YC}</b><span>amarillas</span></div>
+          <div><b>🟥 ${s.RC}</b><span>rojas</span></div>
+        </div>
+        <div class="cf-teams">${teamsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Curiosidades del torneo ----
+const curiosidades = [
+  {t:"🇺🇸 Trump y el caso Balogun", d:"Folarin Balogun fue expulsado ante Bosnia en dieciseisavos, lo que implicaba suspensión automática. Según el propio jugador, Donald Trump llamó a Gianni Infantino y la FIFA levantó la sanción justo antes de octavos. Bélgica protestó formalmente, pero Balogun jugó igual el 1-4 ante los Diablos Rojos."},
+  {t:"🚔 Agentes del ICE en los estadios", d:"Los partidos en Estados Unidos se jugaron bajo un dispositivo federal que incluyó agentes del ICE en los alrededores. El Gobierno aclaró que su presencia era de seguridad y no para operativos migratorios, en medio de cuestionamientos de las comunidades locales."},
+  {t:"😢 El adiós de Cristiano Ronaldo", d:"Con la eliminación de Portugal ante España (1-0, gol de Merino en el 90+1), CR7 disputó su sexto y último Mundial a los 41 años. Salió con lágrimas, abrazado por rivales. Es el único jugador que marcó en 6 Mundiales consecutivos y máximo goleador histórico de Portugal."},
+  {t:"🏥 La caída de Henderson en pleno festejo", d:"Tras la clasificación de Inglaterra ante México, Jordan Henderson (36) sufrió una fuerte caída durante los festejos, fue asistido en el campo y retirado en camilla del Azteca, opacando la celebración inglesa."},
+  {t:"🚣 El festejo del remo de Noruega", d:"Los jugadores noruegos popularizaron un festejo imitando el gesto de remar, en homenaje a sus raíces vikingas y al espíritu de equipo. Se volvió viral tras los goles de Haaland en la fase de grupos y en la eliminación de Brasil."},
+  {t:"🇨🇻 Cabo Verde, la Cenicienta del Mundial", d:"En su primer Mundial, el país más pequeño en clasificar (menos de 600.000 habitantes) llegó hasta dieciseisavos y cayó ante Argentina 3-2 en un partido épico decidido en el alargue. Su arquero Vozinha, de 40 años, entró al XI ideal de la fase de grupos."},
+  {t:"🐐 Messi, máximo goleador histórico de los Mundiales", d:"Con su gol ante Cabo Verde, Messi llegó a 20 goles históricos en Copas del Mundo, superando la marca de Miroslav Klose (16). Además es el primer jugador en marcar en 7 partidos consecutivos de Mundiales."},
+  {t:"🇳🇴 Noruega vuelve a cuartos tras 28 años", d:"La Noruega de Haaland eliminó a Brasil 2-1 con doblete del delantero y una actuación heroica del arquero Nyland, que atajó un penal. Es la primera vez que Noruega alcanza los cuartos de final de un Mundial en su historia."},
+  {t:"🇩🇪 Alemania eliminada por Paraguay en penales", d:"Una de las grandes sorpresas: Paraguay eliminó a la tetracampeona Alemania en la tanda de penales (4-3) tras un 1-1. El plantel paraguayo (~US$178M) valía 6 veces menos que el alemán."},
+  {t:"👋 El adiós de Neymar", d:"Tras la eliminación de Brasil ante Noruega, Neymar anunció su retiro de la selección: 'Empecé aquí y termino aquí'. Se convirtió en el segundo brasileño en marcar en 4 Mundiales, después de Pelé, pero nunca levantó la Copa."},
+  {t:"🏟️ El Azteca, primer estadio en 3 Mundiales", d:"El Estadio Ciudad de México (Azteca) se convirtió en el primer estadio de la historia en albergar partidos de tres Copas del Mundo (1970, 1986 y 2026). Fue el escenario del épico México 2-3 Inglaterra."},
+  {t:"🌍 9 de 10 selecciones africanas a octavos", d:"En el nuevo formato de 48 equipos, África tuvo una actuación histórica: 9 de sus 10 representantes avanzaron a la fase eliminatoria, destacando la sólida organización defensiva de equipos como Marruecos, Egipto y RD Congo."},
+  {t:"🇪🇬 Egipto supera la fase de grupos por primera vez", d:"Los Faraones lograron por primera vez en su historia mundialista superar la fase de grupos, y luego eliminaron a Australia en penales para meterse en octavos, marcando su mejor campaña de siempre."},
+];
+
+function ytSearch(q){ return 'https://www.youtube.com/results?search_query='+encodeURIComponent(q); }
+function newsSearch(q){ return 'https://news.google.com/search?q='+encodeURIComponent(q); }
+
+function renderCurios(){
+  const el = document.getElementById('curiosList');
+  el.innerHTML = curiosidades.map((c,i)=>{
+    const q = c.t.replace(/^[^\s]+\s/,'')+' Mundial 2026';
+    return `<div class="curio-item">
+      <div class="curio-head" onclick="toggleCurio(${i})">
+        <span>${c.t}</span><span class="curio-arrow" id="ca-${i}">▾</span>
+      </div>
+      <div class="curio-body" id="cb-${i}" style="display:none">
+        <p>${c.d}</p>
+        <div class="curio-links">
+          <a href="${ytSearch(q)}" target="_blank" rel="noopener">▶ Ver en YouTube</a>
+          <a href="${newsSearch(q)}" target="_blank" rel="noopener">📰 Leer en medios</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleCurio(i){
+  const b=document.getElementById('cb-'+i), a=document.getElementById('ca-'+i);
+  const open = b.style.display==='none';
+  b.style.display = open?'block':'none';
+  a.textContent = open?'▴':'▾';
+}
 
 function renderBestXI(){
   const pitch = document.getElementById('bestXiPitch');
@@ -1157,6 +1297,8 @@ const R16_RESULTS = {
   P90:{result:'0-3', winner:'Marruecos'},
   P91:{result:'1-2', winner:'Noruega'},
   P92:{result:'2-3', winner:'Inglaterra'},
+  P93:{result:'0-1', winner:'España'},
+  P94:{result:'1-4', winner:'Bélgica'},
 };
 const QF_IDS = ['P97','P98','P99','P100'];
 const SF_IDS = ['SF1','SF2'];
@@ -1300,7 +1442,7 @@ function renderGroupsTable(){
   });
 }
 
-const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats','bestxi'];
+const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats','bestxi','curios','confed','mapa'];
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1568,9 +1710,11 @@ const teamDetails = {
              ["49'","⚽ Sebastian Berhalter (EEUU)"],["90+'","⚽ Kaan Ayhan (TUR)"]], tarjetas:[]},
     {rival:"Bosnia y Herzegovina", marcador:"2-0", estadio:"Levi's Stadium, Santa Clara", arbitro:"por confirmar",
      goles:[["~","⚽ Folarin Balogun (EEUU)"],["82'","⚽ Malik Tillman (EEUU, tiro libre)"]],
-     tarjetas:[["~69'","🟥 Folarin Balogun (EEUU, expulsado — baja para octavos)"]]}
+     tarjetas:[["~69'","🟥 Folarin Balogun (EEUU)"]]},
+    {rival:"Bélgica", marcador:"1-4", estadio:"Lumen Field, Seattle", arbitro:"Adham Makhadmeh (JOR)",
+     goles:[["30'","⚽ Malik Tillman (USA, tiro libre)"]], tarjetas:[]}
   ],
-  matchesNote:"EEUU clasifica a octavos ante Bélgica el 6 de julio. Balogun expulsado y no podrá jugar.",
+  matchesNote:"Estados Unidos, anfitrión, queda eliminado 1-4 por Bélgica en octavos.",
   plantel:[["Matt Freese","GK"],["Matt Turner","GK"],["Chris Brady","GK"],
    ["Chris Richards","DF"],["Tim Ream","DF"],["Mark McKenzie","DF"],["Auston Trusty","DF"],["Miles Robinson","DF"],["Antonee Robinson","DF"],["Sergiño Dest","DF"],["Alex Freeman","DF"],["Joe Scally","DF"],["Max Arfsten","DF"],
    ["Tyler Adams","MC"],["Sebastian Berhalter","MC"],["Weston McKennie","MC"],["Cristian Roldan","MC"],
@@ -1800,9 +1944,12 @@ const teamDetails = {
     {rival:"Senegal", marcador:"3-2 (AET)", estadio:"Lumen Field, Seattle", arbitro:"por confirmar",
      goles:[["24'","⚽ Habib Diarra (SEN)"],["51'","⚽ Ismaïla Sarr (SEN)"],["86'","⚽ Romelu Lukaku (BEL)"],
              ["89'","⚽ Youri Tielemans (BEL)"],["125'","⚽ Youri Tielemans (BEL, penal)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"Estados Unidos", marcador:"4-1", estadio:"Lumen Field, Seattle", arbitro:"Adham Makhadmeh (JOR)",
+     goles:[["8'","⚽ Charles De Ketelaere (BEL)"],["32'","⚽ Charles De Ketelaere (BEL)"],["30'","⚽ Malik Tillman (USA)"],
+             ["57'","⚽ Hans Vanaken (BEL)"],["90'","⚽ Romelu Lukaku (BEL)"]], tarjetas:[]}
   ],
-  matchesNote:"Bélgica remonta de 0-2 a 3-2 en el alargue ante Senegal. Jugará ante EEUU en octavos el 6 de julio.",
+  matchesNote:"Bélgica golea 4-1 a EEUU con doblete de De Ketelaere y avanza a cuartos. Enfrentará a España.",
   plantel:[["Thibaut Courtois","GK"],["Senne Lammens","GK"],["Mike Penders","GK"],
    ["Thomas Meunier","DF"],["Axel Witsel","DF"],["Maxim De Cuyper","DF"],["Brandon Mechele","DF"],["Nathan Ngoy","DF"],["Arthur Theate","DF"],["Zeno Debast","DF"],["Wout Faes","DF"],["Timothy Castagne","DF"],
    ["Youri Tielemans","MC"],["Kevin De Bruyne","MC"],["Nicolas Raskin","MC"],["Amadou Onana","MC"],["Orel Mangala","MC"],["Charles De Ketelaere","MC"],
@@ -1872,9 +2019,11 @@ const teamDetails = {
      goles:[["41'","⚽ Álex Baena (ESP)"]], tarjetas:[["54'","🟨 Juan Manuel Sanabria (URU)"],["~","🟨 Guillermo Varela (URU)"]]},
     {rival:"Austria", marcador:"3-0", estadio:"SoFi Stadium, Los Ángeles", arbitro:"por confirmar",
      goles:[["36'","⚽ Mikel Oyarzabal (ESP)"],["66'","⚽ Pedro Porro (ESP, cabezazo)"],["89'","⚽ Mikel Oyarzabal (ESP, doblete)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"Portugal", marcador:"1-0", estadio:"AT&T Stadium, Dallas", arbitro:"por confirmar",
+     goles:[["90+1'","⚽ Mikel Merino (ESP), asistencia de Ferran Torres"]], tarjetas:[]}
   ],
-  matchesNote:"España clasifica a octavos de final con portería invicta en todo el torneo. Espera al ganador de Portugal-Croacia.",
+  matchesNote:"España clasifica a cuartos con Merino sobre la hora, sin recibir goles en todo el torneo. Enfrentará a Bélgica.",
   plantel:[["Unai Simón","GK"],["David Raya","GK"],["Joan García","GK"],
    ["Marc Llorente","DF"],["Pedro Porro","DF"],["Eric García","DF"],["Jesús Pubill","DF"],["Aymeric Laporte","DF"],["Pau Cubarsí","DF"],["Marc Cucurella","DF"],["Álex Grimaldo","DF"],
    ["Pedri","MC"],["Fabián Ruiz","MC"],["Martín Zubimendi","MC"],["Gavi","MC"],["Rodri Hernández","MC"],["Álex Baena","MC"],["Mikel Merino","MC"],
@@ -2092,9 +2241,11 @@ const teamDetails = {
      goles:[], tarjetas:[]},
     {rival:"Croacia", marcador:"2-1", estadio:"BMO Field, Toronto", arbitro:"por confirmar",
      goles:[["~","⚽ Ivan Perišić (CRO)"],["~","⚽ Cristiano Ronaldo (POR, penal)"],["90+'","⚽ Gonçalo Ramos (POR)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"España", marcador:"0-1", estadio:"AT&T Stadium, Dallas", arbitro:"por confirmar",
+     goles:[], tarjetas:[]}
   ],
-  matchesNote:"Portugal avanza a octavos de final. Enfrentará a España.",
+  matchesNote:"Portugal queda eliminado por España en octavos. Último Mundial de Cristiano Ronaldo (41), goleador en 6 Mundiales seguidos.",
   plantel:[["Diogo Costa","GK"],["José Sá","GK"],["Rui Patrício","GK"],
    ["João Cancelo","DF"],["Rúben Dias","DF"],["Nuno Mendes","DF"],["Gonçalo Inácio","DF"],["Diogo Dalot","DF"],["Nélson Semedo","DF"],["Tomás Araújo","DF"],["António Silva","DF"],
    ["Vitinha","MC"],["João Neves","MC"],["Bruno Fernandes","MC"],["Bernardo Silva","MC"],["Matheus Nunes","MC"],["Rúben Neves","MC"],["João Palhinha","MC"],
@@ -2564,7 +2715,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:122},{year:1998,rank:109},{year:2002,rank:81},{year:2018,rank:104},{year:2026,rank:85}]
 },
 "Estados Unidos":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1930,
   bestShort:"Semifinales (3er puesto)",
   bestResult:"Semifinales (3er puesto)",
@@ -3048,7 +3199,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:96},{year:1998,rank:123},{year:2002,rank:100},{year:2018,rank:110},{year:2026,rank:87}]
 },
 "Portugal":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1966,
   bestShort:"Tercer puesto",
   bestResult:"Tercer puesto",
@@ -5819,12 +5970,15 @@ const scorersRanking = [
   {name:"Cyle Larin",team:"Canadá",goals:2,events:[{rival:"Bosnia y Herzegovina",minute:"78'",marcador:"1-1",estadio:"BMO Field, Toronto"},{rival:"Catar",minute:"16'",marcador:"6-0",estadio:"BC Place, Vancouver"}]},
   {name:"Folarin Balogun",team:"Estados Unidos",goals:3,events:[{rival:"Paraguay",minute:"31'",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"},{rival:"Paraguay",minute:"45+5'",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"},{rival:"Bosnia y Herzegovina",minute:"~",marcador:"2-0",estadio:"Levi's Stadium, Santa Clara"}]},
   {name:"Youri Tielemans",team:"Bélgica",goals:2,events:[{rival:"Senegal",minute:"89'",marcador:"3-2 AET",estadio:"Lumen Field, Seattle"},{rival:"Senegal",minute:"125'",marcador:"3-2 AET",estadio:"Lumen Field, Seattle"}]},
-  {name:"Malik Tillman",team:"Estados Unidos",goals:1,events:[{rival:"Bosnia y Herzegovina",minute:"82'",marcador:"2-0",estadio:"Levi's Stadium, Santa Clara"}]},
+  {name:"Malik Tillman",team:"Estados Unidos",goals:2,events:[{rival:"Bélgica",minute:"30'",marcador:"1-4",estadio:"Lumen Field, Seattle"},{rival:"Bosnia y Herzegovina",minute:"82'",marcador:"2-0",estadio:"Levi's Stadium, Santa Clara"}]},
   {name:"Brian Cipenga",team:"RD Congo",goals:1,events:[{rival:"Inglaterra",minute:"7'",marcador:"1-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Ismael Saibari",team:"Marruecos",goals:2,events:[{rival:"Escocia",minute:"1'",marcador:"1-0",estadio:"Gillette Stadium, Boston (Foxborough)"},{rival:"Haití",minute:"~",marcador:"4-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Johan Manzambi",team:"Suiza",goals:2,events:[{rival:"Bosnia y Herzegovina",minute:"74'",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"},{rival:"Bosnia y Herzegovina",minute:"~",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"}]},
   {name:"Jude Bellingham",team:"Inglaterra",goals:2,events:[{rival:"Croacia",minute:"47'",marcador:"4-2",estadio:"Estadio Dallas (Arlington)"},{rival:"Panamá",minute:"62'",marcador:"2-0",estadio:"Estadio Nueva York Nueva Jersey"}]},
   {name:"Jude Bellingham",team:"Inglaterra",goals:2,events:[{rival:"México",minute:"~",marcador:"3-2",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"México",minute:"~",marcador:"3-2",estadio:"Estadio Ciudad de México (Azteca)"}]},
+  {name:"Charles De Ketelaere",team:"Bélgica",goals:2,events:[{rival:"Estados Unidos",minute:"8'",marcador:"4-1",estadio:"Lumen Field, Seattle"},{rival:"Estados Unidos",minute:"32'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
+  {name:"Mikel Merino",team:"España",goals:1,events:[{rival:"Portugal",minute:"90+1'",marcador:"1-0",estadio:"AT&T Stadium, Dallas"}]},
+  {name:"Hans Vanaken",team:"Bélgica",goals:1,events:[{rival:"Estados Unidos",minute:"57'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
   {name:"Jhon Arias",team:"Colombia",goals:1,events:[{rival:"Ghana",minute:"14'",marcador:"1-0",estadio:"Arrowhead Stadium, Kansas City"}]},
   {name:"Julián Quiñones",team:"México",photo:"Julián Quiñones.png",goals:4,events:[{rival:"Sudáfrica",minute:"9'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Chequia",minute:"~",marcador:"3-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Ecuador",minute:"22'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Inglaterra",minute:"~42'",marcador:"2-3",estadio:"Estadio Ciudad de México (Azteca)"}]},
   {name:"Kai Havertz",team:"Alemania",goals:2,events:[{rival:"Curazao",minute:"45+5'",marcador:"7-1",estadio:"NRG Stadium, Houston"},{rival:"Curazao",minute:"88'",marcador:"7-1",estadio:"NRG Stadium, Houston"}]},
@@ -5903,7 +6057,7 @@ const scorersRanking = [
   {name:"Ramin Rezaeian",team:"Irán",goals:1,events:[{rival:"Nueva Zelanda",minute:"32'",marcador:"2-2",estadio:"Estadio de Los Ángeles (SoFi)"}]},
   {name:"Raúl Jiménez",team:"México",goals:3,events:[{rival:"Sudáfrica",minute:"67'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Ecuador",minute:"31'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Inglaterra",minute:"68'",marcador:"2-3",estadio:"Estadio Ciudad de México (Azteca)"}]},
   {name:"Romano Schmid",team:"Austria",goals:1,events:[{rival:"Jordania",minute:"20'",marcador:"3-1",estadio:"Estadio de la Bahía de San Francisco (Santa Clara)"}]},
-  {name:"Romelu Lukaku",team:"Bélgica",goals:1,events:[{rival:"Nueva Zelanda",minute:"86'",marcador:"5-1",estadio:"BC Place, Vancouver"}]},
+  {name:"Romelu Lukaku",team:"Bélgica",goals:3,events:[{rival:"Nueva Zelanda",minute:"86'",marcador:"5-1",estadio:"BC Place, Vancouver"},{rival:"Senegal",minute:"86'",marcador:"3-2 AET",estadio:"Lumen Field, Seattle"},{rival:"Estados Unidos",minute:"90'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
   {name:"Rubén Vargas",team:"Suiza",goals:1,events:[{rival:"Bosnia y Herzegovina",minute:"~",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"}]},
   {name:"Sebastian Berhalter",team:"Estados Unidos",goals:1,events:[{rival:"Turquía",minute:"49'",marcador:"2-3",estadio:"SoFi Stadium, Los Ángeles"}]},
   {name:"Soufiane Rahimi",team:"Marruecos",goals:1,events:[{rival:"Haití",minute:"~",marcador:"4-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
@@ -6230,6 +6384,8 @@ renderCalendar();
 renderGeneralStandings();
 renderWorldCupStats();
 renderBestXI();
+renderCurios();
+renderConfed();
 
 function onSearchInput(q){
   const box = document.getElementById('searchResults');
@@ -6255,6 +6411,52 @@ function onSearchInput(q){
 document.addEventListener('click', e=>{
   if(!e.target.closest('.search-wrap')) document.getElementById('searchResults').classList.remove('active');
 });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js"></script>
+<script>
+const MAP_ISO={"México":"MEX","Sudáfrica":"ZAF","Corea del Sur":"KOR","Chequia":"CZE","Canadá":"CAN","Suiza":"CHE","Bosnia y Herzegovina":"BIH","Catar":"QAT","Brasil":"BRA","Marruecos":"MAR","Escocia":"_SCO","Haití":"HTI","Estados Unidos":"USA","Australia":"AUS","Paraguay":"PRY","Turquía":"TUR","Alemania":"DEU","Costa de Marfil":"CIV","Ecuador":"ECU","Curazao":"CUW","Países Bajos":"NLD","Japón":"JPN","Suecia":"SWE","Túnez":"TUN","Bélgica":"BEL","Egipto":"EGY","Irán":"IRN","Nueva Zelanda":"NZL","España":"ESP","Cabo Verde":"CPV","Uruguay":"URY","Arabia Saudí":"SAU","Noruega":"NOR","Francia":"FRA","Senegal":"SEN","Irak":"IRQ","Argentina":"ARG","Austria":"AUT","Jordania":"JOR","Argelia":"DZA","Colombia":"COL","Portugal":"PRT","RD Congo":"COD","Uzbekistán":"UZB","Inglaterra":"GBR","Ghana":"GHA","Croacia":"HRV","Panamá":"PAN"};
+const MAP_PHASES={vivo:{c:"#16a34a",t:"En carrera"},final:{c:"#0891b2",t:"Final"},sf:{c:"#be123c",t:"Semifinal"},qf:{c:"#7c3aed",t:"Cuartos"},r16:{c:"#a16207",t:"Octavos"},r32:{c:"#b45309",t:"Dieciseisavos"},grupos:{c:"#64748b",t:"Fase de grupos"}};
+function teamPhase(team){
+  const d=teamDetails[team], w=worldCupHistory[team];
+  if(w&&w.qualified2026) return 'vivo';
+  const n=d.matches.length;
+  return n<=3?'grupos':n===4?'r32':n===5?'r16':n===6?'qf':n===7?'sf':'final';
+}
+function renderWorldMap(){
+  if(typeof Datamap==='undefined'||window._mapDone) return;
+  const cont=document.getElementById('worldMap');
+  if(!cont||cont.offsetWidth===0) return; // aún oculto, esperar
+  const data={};
+  Object.keys(teamDetails).forEach(team=>{
+    let iso=MAP_ISO[team]; if(!iso||iso[0]==='_') return;
+    const ph=teamPhase(team);
+    // Inglaterra/Escocia comparten GBR: se queda la fase más avanzada
+    if(data[iso]){ const ord=['grupos','r32','r16','qf','sf','final','vivo'];
+      if(ord.indexOf(ph)<=ord.indexOf(data[iso].ph)) return; }
+    data[iso]={fillKey:ph,ph};
+  });
+  const fills={defaultFill:"#1e2530"};
+  Object.entries(MAP_PHASES).forEach(([k,v])=>fills[k]=v.c);
+  try{
+    const mapObj=new Datamap({element:document.getElementById('worldMap'),projection:'mercator',
+      fills:fills,data:data,
+      geographyConfig:{borderColor:'#0d1117',highlightOnHover:false,
+        popupTemplate:(g,d)=>d?`<div class="hoverinfo" style="background:#111;color:#fff;padding:4px 8px;border-radius:4px">${g.properties.name}: ${MAP_PHASES[d.ph].t}</div>`:''}});
+    // Escocia: Datamaps la funde en GBR, la marcamos aparte con un punto
+    if(worldCupHistory['Escocia'] && mapObj.latLngToXY){
+      const ph=teamPhase('Escocia'), xy=mapObj.latLngToXY(56.8,-4.2);
+      mapObj.svg.append('circle').attr('cx',xy[0]).attr('cy',xy[1]).attr('r',5)
+        .style('fill',MAP_PHASES[ph].c).style('stroke','#0d1117').style('stroke-width',1)
+        .append('title').text('Escocia: '+MAP_PHASES[ph].t);
+    }
+    window._mapDone=true;
+  }catch(e){}
+  document.getElementById('mapLegend').innerHTML=Object.values(MAP_PHASES).map(v=>
+    `<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:${v.c};display:inline-block"></span>${v.t}</span>`).join('');
+}
+(function(){const o=window.showView||showView;window.showView=function(id){o(id);if(id==='mapa'){setTimeout(renderWorldMap,80);setTimeout(renderWorldMap,400);}};})();
 </script>
 </body>
 </html>
