@@ -175,11 +175,9 @@
 
   /* ---- Tabs (segmented control) ---- */
   .tabs{
-    display:flex; justify-content:center; gap:3px; margin:18px auto 26px; flex-wrap:nowrap; overflow-x:auto;
-    max-width:fit-content; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:5px;
-    -ms-overflow-style:none; scrollbar-width:none;
+    display:flex; justify-content:center; gap:3px; margin:18px auto 26px; flex-wrap:wrap;
+    max-width:820px; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:6px;
   }
-  .tabs::-webkit-scrollbar{display:none}
   .tab-btn{
     flex:0 0 auto; background:transparent; color:var(--muted); border:none;
     padding:9px 13px; border-radius:999px; cursor:pointer; font-size:.76em; font-weight:700;
@@ -480,6 +478,8 @@
   <button class="tab-btn" data-view="curios" onclick="showView('curios')">Curiosidades</button>
   <button class="tab-btn" data-view="confed" onclick="showView('confed')">Confederaciones</button>
   <button class="tab-btn" data-view="mapa" onclick="showView('mapa')">Mapa</button>
+  <button class="tab-btn" data-view="comparar" onclick="showView('comparar')">Comparar</button>
+  <button class="tab-btn" data-view="argentina" onclick="showView('argentina')">🇦🇷 Argentina</button>
 </div>
 
 <div id="groups" class="view active">
@@ -570,6 +570,24 @@
   <div class="note" style="margin-bottom:12px">Mapa mundial coloreado según la fase en que quedó eliminado cada país. Requiere conexión a internet.</div>
   <div id="worldMap" style="max-width:900px;height:440px;margin:0 auto;position:relative"></div>
   <div id="mapLegend" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px auto 0;font-size:.78em"></div>
+  <div id="mapDetail" style="max-width:520px;margin:16px auto 0"></div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="comparar" class="view">
+  <div class="note" style="margin-bottom:14px">Elegí dos selecciones para enfrentarlas métrica por métrica.</div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:520px;margin:0 auto">
+    <select id="cmpA" onchange="renderCompare()" style="flex:1;min-width:140px;padding:8px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px"></select>
+    <select id="cmpB" onchange="renderCompare()" style="flex:1;min-width:140px;padding:8px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px"></select>
+  </div>
+  <div id="cmpResult" style="max-width:520px;margin:18px auto 0"></div>
+  <div class="page-brand">⚽ <b>Chango's Data</b></div>
+</div>
+
+<div id="argentina" class="view">
+  <div class="note" style="margin-bottom:14px">Plantel de <b>🇦🇷 Argentina</b> en el Mundial 2026. Tocá un jugador para ver su foto y sus números en esta Copa.</div>
+  <div id="argSquad"></div>
+  <div id="argDetail" style="max-width:460px;margin:16px auto 0"></div>
   <div class="page-brand">⚽ <b>Chango's Data</b></div>
 </div>
 
@@ -744,7 +762,7 @@ function toggleTheme(){
 }
 
 const TODAY_REF = "7 jul";
-const LAST_UPDATE = "6 de julio de 2026 — P93 España 1-0 Portugal (Merino 90+, adiós de CR7) · P94 Bélgica 4-1 EEUU";
+const LAST_UPDATE = "7 de julio de 2026 — P95 Argentina 3-2 Egipto · P96 Suiza 0-0 Colombia (4-3 pen.) — ¡Octavos completos!";
 document.getElementById('updateBadge').innerHTML = `<span class="dot"></span> Última actualización: ${LAST_UPDATE}`;
 const calendarData = [
 
@@ -752,19 +770,16 @@ const calendarData = [
 
 
 
-  {date:"7 jul", phase:"Octavos de final", matches:[
-    {p:"P95", a:"Argentina",b:"Egipto",venue:"Estadio Atlanta"},
-    {p:"P96", a:"Suiza",b:"Colombia",venue:"Estadio Vancouver"},
-  ]},
+
   {date:"9 jul", phase:"Cuartos de final", matches:[
     {p:"P97", a:"Francia",b:"Marruecos",venue:"Estadio Boston"},
   ]},
   {date:"10 jul", phase:"Cuartos de final", matches:[
-    {p:"P98", a:"Gan. P93",b:"Gan. P94",venue:"Estadio Los Ángeles"},
+    {p:"P98", a:"España",b:"Bélgica",venue:"Estadio Los Ángeles"},
   ]},
   {date:"11 jul", phase:"Cuartos de final", matches:[
     {p:"P99", a:"Noruega",b:"Inglaterra",venue:"Estadio Miami"},
-    {p:"P100", a:"Gan. P95",b:"Gan. P96",venue:"Estadio Kansas City"},
+    {p:"P100", a:"Argentina",b:"Suiza",venue:"Estadio Kansas City"},
   ]},
   {date:"14 jul", phase:"Semifinal", matches:[{p:"SF1", a:"Ganador cuadro superior",b:"",venue:"Estadio Atlanta"}]},
   {date:"18 jul", phase:"3er puesto", matches:[{p:"3P", a:"Perdedor SF1",b:"Perdedor SF2",venue:"Estadio Miami"}]},
@@ -813,6 +828,115 @@ const CONFED_INFO = {
 };
 function scoreParts(m){ const p=m.marcador.split('(')[0].trim().split('-'); return p.length===2?[parseInt(p[0]),parseInt(p[1])]:null; }
 
+// ---- Sección Argentina ----
+const ARG_WIKI={"Emiliano Martínez":"Emiliano_Martínez","Gerónimo Rulli":"Gerónimo_Rulli","Juan Musso":"Juan_Musso","Cristian Romero":"Cristian_Romero","Nicolás Otamendi":"Nicolás_Otamendi","Lisandro Martínez":"Lisandro_Martínez","Nahuel Molina":"Nahuel_Molina","Gonzalo Montiel":"Gonzalo_Montiel","Nicolás Tagliafico":"Nicolás_Tagliafico","Valentín Barco":"Valentín_Barco","Facundo Medina":"Facundo_Medina","Marcos Senesi":"Marcos_Senesi","Rodrigo De Paul":"Rodrigo_De_Paul","Leandro Paredes":"Leandro_Paredes","Alexis Mac Allister":"Alexis_Mac_Allister","Enzo Fernández":"Enzo_Fernández","Giovani Lo Celso":"Giovani_Lo_Celso","Exequiel Palacios":"Exequiel_Palacios","Lionel Messi":"Lionel_Messi","Julián Álvarez":"Julián_Álvarez","Lautaro Martínez":"Lautaro_Martínez","Thiago Almada":"Thiago_Almada","Nicolás Paz":"Nicolás_Paz","Nicolás González":"Nicolás_González_(footballer,_born_1998)","Giuliano Simeone":"Giuliano_Simeone","José Manuel López":"José_Manuel_López_(footballer,_born_2001)"};
+const POS_LABEL={GK:"Arqueros",DF:"Defensores",MC:"Mediocampistas",DL:"Delanteros"};
+const ARG_INFO={
+"Emiliano Martínez":{edad:33,club:"Aston Villa (ING)",tray:"Independiente → Arsenal → Aston Villa"},
+"Gerónimo Rulli":{edad:34,club:"Olympique Marsella (FRA)",tray:"Estudiantes → Real Sociedad → Ajax → Marsella"},
+"Juan Musso":{edad:32,club:"Atlético Madrid (ESP)",tray:"Racing → Udinese → Atalanta → Atlético"},
+"Cristian Romero":{edad:28,club:"Tottenham (ING)",tray:"Belgrano → Genoa → Atalanta → Tottenham"},
+"Nicolás Otamendi":{edad:38,club:"Benfica (POR)",tray:"Vélez → Porto → Valencia → Man City → Benfica"},
+"Lisandro Martínez":{edad:28,club:"Manchester United (ING)",tray:"Newell's → Ajax → Man United"},
+"Nahuel Molina":{edad:28,club:"Atlético Madrid (ESP)",tray:"Boca → Udinese → Atlético"},
+"Gonzalo Montiel":{edad:29,club:"River Plate (ARG)",tray:"River → Sevilla → River"},
+"Nicolás Tagliafico":{edad:33,club:"Olympique Lyon (FRA)",tray:"Banfield → Independiente → Ajax → Lyon"},
+"Valentín Barco":{edad:21,club:"Estrasburgo (FRA)",tray:"Boca → Brighton → Estrasburgo"},
+"Facundo Medina":{edad:26,club:"Olympique Marsella (FRA)",tray:"Talleres → Lens → Marsella"},
+"Marcos Senesi":{edad:28,club:"Bournemouth (ING)",tray:"San Lorenzo → Feyenoord → Bournemouth"},
+"Rodrigo De Paul":{edad:31,club:"Inter Miami (EEUU)",tray:"Racing → Valencia → Udinese → Atlético → Inter Miami"},
+"Leandro Paredes":{edad:31,club:"Boca Juniors (ARG)",tray:"Boca → Roma → PSG → Juventus → Roma → Boca"},
+"Alexis Mac Allister":{edad:27,club:"Liverpool (ING)",tray:"Argentinos → Brighton → Liverpool"},
+"Enzo Fernández":{edad:25,club:"Chelsea (ING)",tray:"River → Benfica → Chelsea"},
+"Giovani Lo Celso":{edad:30,club:"Real Betis (ESP)",tray:"Rosario Central → PSG → Tottenham → Betis"},
+"Exequiel Palacios":{edad:27,club:"Bayer Leverkusen (ALE)",tray:"River → Leverkusen"},
+"Lionel Messi":{edad:39,club:"Inter Miami (EEUU)",tray:"Barcelona → PSG → Inter Miami"},
+"Julián Álvarez":{edad:26,club:"Atlético Madrid (ESP)",tray:"River → Man City → Atlético"},
+"Lautaro Martínez":{edad:28,club:"Inter (ITA)",tray:"Racing → Inter"},
+"Thiago Almada":{edad:25,club:"Atlético Madrid (ESP)",tray:"Vélez → Atlanta United → Botafogo → Lyon → Atlético"},
+"Nicolás Paz":{edad:21,club:"Como (ITA)",tray:"Real Madrid → Como"},
+"Nicolás González":{edad:28,club:"Juventus (ITA)",tray:"Argentinos → Stuttgart → Fiorentina → Juventus"},
+"Giuliano Simeone":{edad:23,club:"Atlético Madrid (ESP)",tray:"River → Atlético (cedido en Zaragoza, Alavés)"},
+"José Manuel López":{edad:24,club:"Palmeiras (BRA)",tray:"Lanús → Palmeiras"},
+};
+function argPlayerStats(name){
+  let g=0,y=0,r=0; const goles=[];
+  teamDetails['Argentina'].matches.forEach(m=>{
+    m.goles.forEach(ev=>{ if(ev[1].includes(name.split(' ').slice(-1)[0])||ev[1].includes(name)){ if(ev[1].includes('autogol'))return; g++; goles.push(`vs ${m.rival} (${ev[0]})`);} });
+    m.tarjetas.forEach(t=>{ if(t[1].includes(name)){ if(t[1].includes('🟨'))y++; if(t[1].includes('🟥'))r++; } });
+  });
+  return {g,y,r,goles};
+}
+function renderArgSquad(){
+  const el=document.getElementById('argSquad');
+  const plantel=teamDetails['Argentina'].plantel;
+  const byPos={GK:[],DF:[],MC:[],DL:[]};
+  plantel.forEach((p,i)=>byPos[p[1]].push({name:p[0],i}));
+  el.innerHTML=Object.entries(byPos).map(([pos,arr])=>`
+    <div style="margin-bottom:12px">
+      <div style="color:var(--gold);font-family:var(--display);font-size:.85em;letter-spacing:.04em;margin-bottom:6px">${POS_LABEL[pos]}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${arr.map(p=>`<span onclick="showArgPlayer('${p.name.replace(/'/g,"\\'")}')" style="cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:.82em;transition:border-color .15s" onmouseover="this.style.borderColor='var(--turf)'" onmouseout="this.style.borderColor='var(--line)'">${p.name}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function showArgPlayer(name){
+  const st=argPlayerStats(name), wiki=ARG_WIKI[name], info=ARG_INFO[name]||{};
+  const img=wiki?`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wiki)}`:null;
+  const box=document.getElementById('argDetail');
+  const golesHtml=st.goles.length?`<div style="margin-top:8px;font-size:.82em;color:var(--muted)">⚽ ${st.goles.join(' · ')}</div>`:'';
+  const ytGoles=st.g>0?`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(name+' goles Mundial 2026 Argentina')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;background:var(--card-hi);border:1px solid var(--gold);color:var(--gold);padding:5px 14px;border-radius:999px;font-size:.78em;text-decoration:none;font-weight:700">▶ Ver sus goles en YouTube</a>`:'';
+  box.innerHTML=`<div class="curio-item" style="padding:16px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="argImg" style="width:64px;height:64px;border-radius:50%;background:#75aadb center top/cover no-repeat;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.6em">🇦🇷</div>
+      <div><h4 style="margin:0;color:var(--gold)">${name}${info.edad?` <span style="font-size:.7em;color:var(--muted);font-weight:400">${info.edad} años</span>`:''}</h4>
+      <div style="font-size:.82em;color:var(--text);margin-top:2px">${info.club||'🇦🇷 Argentina'}</div></div>
+    </div>
+    ${info.tray?`<div style="font-size:.76em;color:var(--muted);margin-top:10px"><b style="color:var(--text)">Trayectoria:</b> ${info.tray}</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+      <div style="background:var(--card-hi);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center"><b style="display:block;font-size:1.3em;color:var(--turf)">${st.g}</b><span style="font-size:.68em;color:var(--muted)">goles</span></div>
+      <div style="background:var(--card-hi);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center"><b style="display:block;font-size:1.3em;color:#eab308">${st.y}</b><span style="font-size:.68em;color:var(--muted)">🟨 amarillas</span></div>
+      <div style="background:var(--card-hi);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center"><b style="display:block;font-size:1.3em;color:#ef4444">${st.r}</b><span style="font-size:.68em;color:var(--muted)">🟥 rojas</span></div>
+    </div>${golesHtml}${ytGoles}
+    <a href="https://www.sofascore.com/es/search?q=${encodeURIComponent(name)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;margin-left:8px;background:var(--card-hi);border:1px solid var(--line);color:var(--muted);padding:5px 14px;border-radius:999px;font-size:.78em;text-decoration:none;font-weight:700">📊 Minutos y stats en Sofascore</a>
+    <div style="font-size:.72em;color:var(--muted);margin-top:10px">Los minutos jugados y otras métricas en vivo están en su perfil de Sofascore.</div>
+  </div>`;
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(img) fetch(img).then(r=>r.json()).then(d=>{ const src=d?.thumbnail?.source; if(src){const el=document.getElementById('argImg'); if(el){el.style.background="#75aadb url('"+src+"') center top/cover no-repeat";el.textContent='';}} }).catch(()=>{});
+}
+
+function teamStats(team){
+  const d=teamDetails[team]; let s={PJ:0,PG:0,PE:0,PP:0,GF:0,GC:0,YC:0,RC:0};
+  d.matches.forEach(m=>{
+    const p=m.marcador.split('(')[0].trim().split('-'); if(p.length!==2)return;
+    const gf=+p[0],gc=+p[1]; s.PJ++;s.GF+=gf;s.GC+=gc;
+    if(gf>gc)s.PG++;else if(gf===gc)s.PE++;else s.PP++;
+    m.tarjetas.forEach(t=>{if(t[1].includes('🟨'))s.YC++;if(t[1].includes('🟥'))s.RC++;});
+  });
+  s.DIF=s.GF-s.GC; s.fase=MAP_PHASES[teamPhase(team)].t; return s;
+}
+function initCompare(){
+  const names=Object.keys(teamDetails).sort((a,b)=>a.localeCompare(b));
+  const opt=t=>`<option value="${t}">${flags[t]||''} ${t}</option>`;
+  const A=document.getElementById('cmpA'),B=document.getElementById('cmpB');
+  A.innerHTML=names.map(opt).join(''); B.innerHTML=names.map(opt).join('');
+  A.value=names[0]; B.value=names[1]; renderCompare();
+}
+function renderCompare(){
+  const a=document.getElementById('cmpA').value, b=document.getElementById('cmpB').value;
+  if(!a||!b) return;
+  const sa=teamStats(a), sb=teamStats(b);
+  const rows=[['Fase alcanzada','fase',0],['Partidos','PJ',0],['Ganados','PG',1],['Empatados','PE',0],['Perdidos','PP',-1],['Goles a favor','GF',1],['Goles en contra','GC',-1],['Diferencia','DIF',1],['🟨 Amarillas','YC',-1],['🟥 Rojas','RC',-1]];
+  const hl='color:var(--turf);font-weight:800';
+  const body=rows.map(([lbl,k,dir])=>{
+    let la='',lb='';
+    if(dir!==0 && typeof sa[k]==='number'){ if((sa[k]-sb[k])*dir>0)la=hl; else if((sa[k]-sb[k])*dir<0)lb=hl; }
+    return `<tr><td style="text-align:right;padding:6px 10px;${la}">${sa[k]}</td><td style="text-align:center;padding:6px;color:var(--muted);font-size:.82em">${lbl}</td><td style="padding:6px 10px;${lb}">${sb[k]}</td></tr>`;
+  }).join('');
+  document.getElementById('cmpResult').innerHTML=`<table style="width:100%;border-collapse:collapse">
+    <thead><tr><th style="text-align:right;padding:8px 10px">${flags[a]||''} ${a}</th><th></th><th style="text-align:left;padding:8px 10px">${flags[b]||''} ${b}</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
 function renderConfed(){
   const st={};
   Object.entries(teamDetails).forEach(([team,d])=>{
@@ -864,6 +988,9 @@ function renderConfed(){
 
 // ---- Curiosidades del torneo ----
 const curiosidades = [
+  {t:"🇨🇭 Suiza, el rey de los penales", d:"Suiza eliminó a Colombia por penales (4-3) tras un 0-0, en un torneo donde las tandas fueron protagonistas. Ya son 8 los partidos de octavos y varios dieciseisavos que se definieron desde los doce pasos en este Mundial."},
+  {t:"🐐 Messi lidera el Botín de Oro", d:"Con su gol ante Egipto (remontada 3-2 desde 0-2), Messi llegó a 8 goles y encabeza en solitario la tabla de goleadores, por delante de Mbappé y Haaland (7). A los 38 años, va por su segundo título mundial consecutivo."},
+  {t:"🇧🇷 Brasil afuera en octavos por primera vez en 35 años", d:"La eliminación ante Noruega dejó a Brasil sin cuartos de final por primera vez desde Italia 1990. Sumado a las caídas de Alemania y Países Bajos, marca uno de los Mundiales con más potencias eliminadas temprano."},
   {t:"🇺🇸 Trump y el caso Balogun", d:"Folarin Balogun fue expulsado ante Bosnia en dieciseisavos, lo que implicaba suspensión automática. Según el propio jugador, Donald Trump llamó a Gianni Infantino y la FIFA levantó la sanción justo antes de octavos. Bélgica protestó formalmente, pero Balogun jugó igual el 1-4 ante los Diablos Rojos."},
   {t:"🚔 Agentes del ICE en los estadios", d:"Los partidos en Estados Unidos se jugaron bajo un dispositivo federal que incluyó agentes del ICE en los alrededores. El Gobierno aclaró que su presencia era de seguridad y no para operativos migratorios, en medio de cuestionamientos de las comunidades locales."},
   {t:"😢 El adiós de Cristiano Ronaldo", d:"Con la eliminación de Portugal ante España (1-0, gol de Merino en el 90+1), CR7 disputó su sexto y último Mundial a los 41 años. Salió con lágrimas, abrazado por rivales. Es el único jugador que marcó en 6 Mundiales consecutivos y máximo goleador histórico de Portugal."},
@@ -1299,6 +1426,8 @@ const R16_RESULTS = {
   P92:{result:'2-3', winner:'Inglaterra'},
   P93:{result:'0-1', winner:'España'},
   P94:{result:'1-4', winner:'Bélgica'},
+  P95:{result:'3-2', winner:'Argentina'},
+  P96:{result:'0-0 (4-3p)', winner:'Suiza'},
 };
 const QF_IDS = ['P97','P98','P99','P100'];
 const SF_IDS = ['SF1','SF2'];
@@ -1442,7 +1571,7 @@ function renderGroupsTable(){
   });
 }
 
-const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats','bestxi','curios','confed','mapa'];
+const TAB_ORDER = ['groups','bracket','scorers','cards','stadiums','calendar','general','stats','bestxi','curios','confed','mapa','comparar','argentina'];
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1573,9 +1702,13 @@ const teamDetails = {
      tarjetas:[["~","🟨 Nico Elvedi (SUI)"],["~","🟥 Tarik Muharemović (BIH)"]]},
     {rival:"Canadá", marcador:"2-1", estadio:"BC Place, Vancouver", arbitro:"Ramon Abatti (BRA)",
      goles:[["47'","⚽ Rubén Vargas (SUI)"],["57'","⚽ Johan Manzambi (SUI)"],["75'","⚽ Promise David (CAN)"]],
-     tarjetas:[]}
+     tarjetas:[]},
+    {rival:"Argelia", marcador:"2-0", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
+     goles:[["10'","⚽ Breel Embolo (SUI)"],["46'","⚽ Dan Ndoye (SUI)"]], tarjetas:[]},
+    {rival:"Colombia", marcador:"0-0 (4-3 pen.)", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
+     goles:[], tarjetas:[]}
   ],
-  matchesNote:"Suiza clasifica a dieciseisavos como líder del Grupo B.",
+  matchesNote:"Suiza elimina a Colombia por penales (4-3) y avanza a cuartos. Enfrentará a Argentina el 11 de julio en Kansas City.",
   plantel:[["Gregor Kobel","GK"],["Yvon Mvogo","GK"],["Marvin Keller","GK"],
    ["Manuel Akanji","DF"],["Aurèle Amenda","DF"],["Eray Cömert","DF"],["Nico Elvedi","DF"],["Luca Jaquez","DF"],["Miro Muheim","DF"],["Ricardo Rodríguez","DF"],["Silvan Widmer","DF"],
    ["Granit Xhaka","MC"],["Ardon Jashari","MC"],["Denis Zakaria","MC"],["Djibril Sow","MC"],["Michel Aebischer","MC"],["Remo Freuler","MC"],["Fabian Rieder","MC"],["Johan Manzambi","MC"],["Christian Fassnacht","MC"],
@@ -1966,9 +2099,11 @@ const teamDetails = {
     {rival:"Irán", marcador:"1-1", estadio:"Lumen Field, Seattle", arbitro:"por confirmar",
      goles:[["5'","⚽ Mahmoud Saber (EGY)"],["14'","⚽ Ramin Rezaeian (IRN)"]], tarjetas:[]},
     {rival:"Australia", marcador:"1-1 (4-2 pen.)", estadio:"AT&T Stadium, Dallas", arbitro:"por confirmar",
-     goles:[["13'","⚽ Emam Ashour (EGY)"]], tarjetas:[]}
+     goles:[["13'","⚽ Emam Ashour (EGY)"]], tarjetas:[]},
+    {rival:"Argentina", marcador:"2-3", estadio:"Mercedes-Benz Stadium, Atlanta", arbitro:"por confirmar",
+     goles:[["14'","⚽ Yasser Ibrahim (EGY)"],["67'","⚽ Mostafa Zizo (EGY)"]], tarjetas:[["~","🟨 Mostafa Shobeir (EGY)"]]}
   ],
-  matchesNote:"Egipto clasifica a octavos por primera vez en su historia, eliminando a Australia en penales.",
+  matchesNote:"Egipto queda eliminado ante Argentina pese a ir ganando 2-0. Su mejor Mundial histórico.",
   plantel:[["Mohamed El Shennawy","GK"],["Mostafa Shobeir","GK"],["Mohamed Alaa","GK"],
    ["Hossam Abdelmagid","DF"],["Mohamed Abdelmonem","DF"],["Tarek Alaa","DF"],["Ahmed Fatouh","DF"],["Karim Hafez","DF"],["Mohamed Hany","DF"],["Yasser Ibrahim","DF"],["Rami Rabia","DF"],["Akram Tawfik","DF"],
    ["Emam Ashour","MC"],["Marwan Attia","MC"],["Nabil Emad","MC"],["Hamdi Fathy","MC"],["Haitham Hassan","MC"],["Mohanad Lashin","MC"],["Mahmoud Saber","MC"],["Mahmoud Hassan Trezeguet","MC"],["Mostafa Zico","MC"],["Ahmed Sayed Zizo","MC"],
@@ -2162,12 +2297,16 @@ const teamDetails = {
     {rival:"Cabo Verde", marcador:"3-2 (AET)", estadio:"Hard Rock Stadium, Miami", arbitro:"por confirmar",
      goles:[["29'","⚽ Lionel Messi (ARG) — 20º gol histórico en Mundiales"],["~","⚽ Deroy Duarte (CPV)"],
              ["~","⚽ Lisandro Martínez (ARG)"],["~","⚽ Sidny Cabral (CPV)"],["120+","⚽ Diney (autogol, CPV)"]],
+     tarjetas:[]},
+    {rival:"Egipto", marcador:"3-2", estadio:"Mercedes-Benz Stadium, Atlanta", arbitro:"por confirmar",
+     goles:[["14'","⚽ Yasser Ibrahim (EGY)"],["67'","⚽ Mostafa Zizo (EGY)"],["79'","⚽ Cristian Romero (ARG)"],
+             ["83'","⚽ Lionel Messi (ARG)"],["90+","⚽ Enzo Fernández (ARG)"]],
      tarjetas:[]}
   ],
-  matchesNote:"Argentina clasifica a octavos. Messi llega a 20 goles históricos en Mundiales y 7 en este torneo — máximo artillero. Messi termina como máximo goleador histórico de los Mundiales con 19 goles en su carrera.",
+  matchesNote:"Argentina remonta un 0-2 y vence 3-2 a Egipto en Atlanta. Messi erró un penal pero marcó el 2-2. Enfrentará al ganador de Suiza-Colombia. Messi termina como máximo goleador histórico de los Mundiales con 19 goles en su carrera.",
   plantel:[["Emiliano Martínez","GK"],["Gerónimo Rulli","GK"],["Juan Musso","GK"],
-   ["Cristian Romero","DF"],["Nicolás Otamendi","DF"],["Lisandro Martínez","DF"],["Nahuel Molina","DF"],["Gonzalo Montiel","DF"],["Nicolás Tagliafico","DF"],["Valentín Barco","DF"],["Facundo Medina","DF"],["Marcos Senesi","DF"],
-   ["Rodrigo De Paul","MC"],["Leandro Paredes","MC"],["Alexis Mac Allister","MC"],["Enzo Fernández","MC"],["Giovani Lo Celso","MC"],["Exequiel Palacios","MC"],
+   ["Cristian Romero","DF"],["Nicolás Otamendi","DF"],["Lisandro Martínez","DF"],["Nahuel Molina","DF"],["Gonzalo Montiel","DF"],["Nicolás Tagliafico","DF"],["Facundo Medina","DF"],["Marcos Senesi","DF"],
+   ["Rodrigo De Paul","MC"],["Leandro Paredes","MC"],["Alexis Mac Allister","MC"],["Enzo Fernández","MC"],["Giovani Lo Celso","MC"],["Exequiel Palacios","MC"],["Valentín Barco","MC"],
    ["Lionel Messi","DL"],["Julián Álvarez","DL"],["Lautaro Martínez","DL"],["Thiago Almada","DL"],["Nicolás Paz","DL"],["Nicolás González","DL"],["Giuliano Simeone","DL"],["José Manuel López","DL"]]
 },
 "Argelia":{
@@ -2297,9 +2436,11 @@ const teamDetails = {
     {rival:"Portugal", marcador:"0-0", estadio:"Estadio Miami (Hard Rock)", arbitro:"por confirmar",
      goles:[], tarjetas:[]},
     {rival:"Ghana", marcador:"1-0", estadio:"Arrowhead Stadium, Kansas City", arbitro:"por confirmar",
-     goles:[["14'","⚽ Jhon Arias (COL)"]], tarjetas:[]}
+     goles:[["14'","⚽ Jhon Arias (COL)"]], tarjetas:[]},
+    {rival:"Suiza", marcador:"0-0 (3-4 pen.)", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
+     goles:[], tarjetas:[]}
   ],
-  matchesNote:"Colombia clasifica a octavos donde enfrentará a Suiza en Vancouver.",
+  matchesNote:"Colombia queda eliminada por Suiza en penales, con fallos de Dávinson Sánchez y Cucho Hernández.",
   plantel:[["Camilo Vargas","GK"],["Álvaro Montero","GK"],["David Ospina","GK"],
    ["Dávinson Sánchez","DF"],["Jhon Lucumí","DF"],["Yerry Mina","DF"],["Willer Ditta","DF"],["Daniel Muñoz","DF"],["Santiago Arias","DF"],["Johan Mojica","DF"],["Deiver Machado","DF"],
    ["Richard Ríos","MC"],["Jefferson Lerma","MC"],["Kevin Castaño","MC"],["Juan Camilo Portilla","MC"],["Gustavo Puerta","MC"],["Jhon Arias","MC"],["Jorge Carrascal","MC"],["Juan Fernando Quintero","MC"],["James Rodríguez","MC"],
@@ -2949,7 +3090,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:27},{year:1998,rank:32},{year:2002,rank:23},{year:2018,rank:3},{year:2026,rank:5}]
 },
 "Egipto":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1934,
   bestShort:"Fase de grupos",
   bestResult:"Fase de grupos",
@@ -3217,7 +3358,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:22},{year:1998,rank:39},{year:2002,rank:5},{year:2018,rank:4},{year:2026,rank:5}]
 },
 "Colombia":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1962,
   bestShort:"Cuartos de final",
   bestResult:"Cuartos de final",
@@ -5952,7 +6093,7 @@ function openPlayer(team, name){
 function closePlayer(){document.getElementById('pmodalBg').classList.remove('active')}
 
 const scorersRanking = [
-  {name:"Lionel Messi",team:"Argentina",photo:"Lionel Messi 20180626.jpg",goals:7,events:[{rival:"Argelia",minute:"17'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Rodrigo De Paul"},{rival:"Argelia",minute:"60'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"sin dato"},{rival:"Argelia",minute:"76'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Nicolás González"},{rival:"Austria",minute:"38'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"Facundo Medina"},{rival:"Austria",minute:"90+4'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"sin dato"},{rival:"Jordania",minute:"79'",marcador:"3-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Cabo Verde",minute:"29'",marcador:"3-2 AET",estadio:"Hard Rock Stadium, Miami"}]},
+  {name:"Lionel Messi",team:"Argentina",photo:"Lionel Messi 20180626.jpg",goals:8,events:[{rival:"Argelia",minute:"17'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Rodrigo De Paul"},{rival:"Argelia",minute:"60'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"sin dato"},{rival:"Argelia",minute:"76'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Nicolás González"},{rival:"Austria",minute:"38'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"Facundo Medina"},{rival:"Austria",minute:"90+4'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"sin dato"},{rival:"Jordania",minute:"79'",marcador:"3-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Cabo Verde",minute:"29'",marcador:"3-2 AET",estadio:"Hard Rock Stadium, Miami"},{rival:"Egipto",minute:"83'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Erling Haaland",team:"Noruega",photo:"Erling Haaland 2023.jpg",goals:7,events:[{rival:"Irak",minute:"29'",marcador:"4-1",estadio:"Gillette Stadium, Boston (Foxborough)",asistencia:"David Møller Wolfe"},{rival:"Irak",minute:"43'",marcador:"4-1",estadio:"Gillette Stadium, Boston (Foxborough)",asistencia:"sin dato (rebote tras error en salida de Irak)"},{rival:"Senegal",minute:"48'",marcador:"3-2",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Martin Ødegaard"},{rival:"Senegal",minute:"58'",marcador:"3-2",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Patrick Berg"},{rival:"Costa de Marfil",minute:"86'",marcador:"2-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Brasil",minute:"80'",marcador:"2-1",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Brasil",minute:"90+'",marcador:"2-1",estadio:"MetLife Stadium, Nueva Jersey"}]},
   {name:"Kylian Mbappé",team:"Francia",photo:"Kylian Mbappé France.jpg",goals:7,events:[{rival:"Senegal",minute:"66'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Michael Olise"},{rival:"Senegal",minute:"90+6'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"sin dato (jugada individual)"},{rival:"Irak",minute:"14'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Michael Olise"},{rival:"Irak",minute:"53'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Ousmane Dembélé"},{rival:"Suecia",minute:"45'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Suecia",minute:"74'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Paraguay",minute:"~",marcador:"1-0",estadio:"Lincoln Financial Field, Filadelfia"}]},
   {name:"Ousmane Dembélé",team:"Francia",photo:"Ousmane Dembélé 2018.jpg",goals:4,events:[{rival:"Irak",minute:"63'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia"},{rival:"Noruega",minute:"7'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"20'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"32'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"}]},
@@ -5979,6 +6120,10 @@ const scorersRanking = [
   {name:"Charles De Ketelaere",team:"Bélgica",goals:2,events:[{rival:"Estados Unidos",minute:"8'",marcador:"4-1",estadio:"Lumen Field, Seattle"},{rival:"Estados Unidos",minute:"32'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
   {name:"Mikel Merino",team:"España",goals:1,events:[{rival:"Portugal",minute:"90+1'",marcador:"1-0",estadio:"AT&T Stadium, Dallas"}]},
   {name:"Hans Vanaken",team:"Bélgica",goals:1,events:[{rival:"Estados Unidos",minute:"57'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
+  {name:"Cristian Romero",team:"Argentina",goals:1,events:[{rival:"Egipto",minute:"79'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
+  {name:"Enzo Fernández",team:"Argentina",goals:1,events:[{rival:"Egipto",minute:"90+'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
+  {name:"Yasser Ibrahim",team:"Egipto",goals:1,events:[{rival:"Argentina",minute:"14'",marcador:"2-3",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
+  {name:"Mostafa Zizo",team:"Egipto",goals:1,events:[{rival:"Argentina",minute:"67'",marcador:"2-3",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Jhon Arias",team:"Colombia",goals:1,events:[{rival:"Ghana",minute:"14'",marcador:"1-0",estadio:"Arrowhead Stadium, Kansas City"}]},
   {name:"Julián Quiñones",team:"México",photo:"Julián Quiñones.png",goals:4,events:[{rival:"Sudáfrica",minute:"9'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Chequia",minute:"~",marcador:"3-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Ecuador",minute:"22'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Inglaterra",minute:"~42'",marcador:"2-3",estadio:"Estadio Ciudad de México (Azteca)"}]},
   {name:"Kai Havertz",team:"Alemania",goals:2,events:[{rival:"Curazao",minute:"45+5'",marcador:"7-1",estadio:"NRG Stadium, Houston"},{rival:"Curazao",minute:"88'",marcador:"7-1",estadio:"NRG Stadium, Houston"}]},
@@ -6269,22 +6414,22 @@ function openCardDetail(i){
 
 
 const stadiumsData = [
-  {name:"Estadio Ciudad de México",upcoming:[],photo:"Estadio Azteca desde el aire 1.jpg",alias:"Estadio Azteca / Banorte",city:"Ciudad de México",country:"México",capacity:83264,opened:1966,note:"Sede inaugural. Primer estadio en albergar 3 Mundiales.",matches:[{a:"México",b:"Sudáfrica",marcador:"2-0",grupo:"A",matchday:1},{a:"Sudáfrica",b:"México",marcador:"0-2",grupo:"A",matchday:1},{a:"Uzbekistán",b:"Colombia",marcador:"1-3",grupo:"K",matchday:1},{a:"Colombia",b:"Uzbekistán",marcador:"3-1",grupo:"K",matchday:1}]},
+  {name:"Estadio Ciudad de México",upcoming:[],photo:"Estadio Azteca desde el aire 1.jpg",alias:"Estadio Azteca / Banorte",city:"Ciudad de México",country:"México",capacity:83264,opened:1966,note:"Sede inaugural. Primer estadio en albergar 3 Mundiales.",matches:[{a:"México",b:"Sudáfrica",marcador:"2-0",grupo:"A",matchday:1},{a:"Sudáfrica",b:"México",marcador:"0-2",grupo:"A",matchday:1},{a:"Uzbekistán",b:"Colombia",marcador:"1-3",grupo:"K",matchday:1},{a:"Colombia",b:"Uzbekistán",marcador:"3-1",grupo:"K",matchday:1},{a:"México",b:"Ecuador",marcador:"2-0",fase:"Dieciseisavos"},{a:"México",b:"Inglaterra",marcador:"2-3",fase:"Octavos"}]},
   {name:"Estadio Guadalajara",upcoming:[],photo:"Estadio Omnilife Chivas.jpg",alias:"Estadio Akron",city:"Zapopan",country:"México",capacity:49850,opened:2010,note:"Casa de Chivas, en el área metropolitana de Guadalajara.",matches:[{a:"México",b:"Corea del Sur",marcador:"1-0",grupo:"A",matchday:2},{a:"Corea del Sur",b:"Chequia",marcador:"2-1",grupo:"A",matchday:1},{a:"Corea del Sur",b:"México",marcador:"0-1",grupo:"A",matchday:2},{a:"Chequia",b:"Corea del Sur",marcador:"1-2",grupo:"A",matchday:1}]},
-  {name:"Estadio Monterrey",upcoming:[],photo:"Mexico Guadalupe Monterrey Estadio BBVA Bancomer fifa world cup 2026 1.JPG",alias:"Estadio BBVA",city:"Guadalupe",country:"México",capacity:53500,opened:2015,note:"Casa de Rayados de Monterrey.",matches:[{a:"Japón",b:"Túnez",marcador:"4-0",grupo:"F",matchday:2},{a:"Suecia",b:"Túnez",marcador:"5-1",grupo:"F",matchday:1},{a:"Túnez",b:"Suecia",marcador:"1-5",grupo:"F",matchday:1},{a:"Túnez",b:"Japón",marcador:"0-4",grupo:"F",matchday:2}]},
-  {name:"Estadio Nueva York Nueva Jersey",upcoming:["GRAN FINAL — 19 de julio"],photo:"Metlife stadium.jpg",alias:"MetLife Stadium",city:"East Rutherford, NJ",country:"Estados Unidos",capacity:82500,opened:2010,note:"Sede de la GRAN FINAL del torneo, el 19 de julio.",matches:[{a:"Brasil",b:"Marruecos",marcador:"1-1",grupo:"C",matchday:1},{a:"Francia",b:"Senegal",marcador:"3-1",grupo:"I",matchday:1},{a:"Senegal",b:"Francia",marcador:"1-3",grupo:"I",matchday:1},{a:"Senegal",b:"Noruega",marcador:"2-3",grupo:"I",matchday:2},{a:"Noruega",b:"Senegal",marcador:"3-2",grupo:"I",matchday:2},{a:"Ecuador",b:"Alemania",marcador:"2-1",grupo:"E",matchday:3},{a:"Alemania",b:"Ecuador",marcador:"1-2",grupo:"E",matchday:3}]},
-  {name:"Estadio Dallas",upcoming:["P93 Octavos: Portugal vs España — 6 jul"],photo:"AT&T Stadium Aerial.jpeg",alias:"AT&T Stadium",city:"Arlington, TX",country:"Estados Unidos",capacity:80000,opened:2009,note:"Techo retráctil. La sede con más partidos de todo el Mundial (9 en total).",matches:[{a:"Países Bajos",b:"Japón",marcador:"2-2",grupo:"F",matchday:1},{a:"Argentina",b:"Austria",marcador:"2-0",grupo:"J",matchday:2},{a:"Austria",b:"Argentina",marcador:"0-2",grupo:"J",matchday:2},{a:"Inglaterra",b:"Croacia",marcador:"4-2",grupo:"L",matchday:1},{a:"Croacia",b:"Inglaterra",marcador:"2-4",grupo:"L",matchday:1},{a:"Japón",b:"Suecia",marcador:"1-1",grupo:"F",matchday:3},{a:"Suecia",b:"Japón",marcador:"1-1",grupo:"F",matchday:3}]},
-  {name:"Estadio Los Ángeles",upcoming:["P98 Cuartos: Gan.P93 vs Gan.P94 — 10 jul"],photo:"SoFi Stadium.jpg",alias:"SoFi Stadium",city:"Inglewood, CA",country:"Estados Unidos",capacity:70000,opened:2020,note:"Uno de los estadios más modernos y caros jamás construidos.",matches:[{a:"Suiza",b:"Bosnia y Herzegovina",marcador:"4-1",grupo:"B",matchday:2},{a:"Bosnia y Herzegovina",b:"Suiza",marcador:"1-4",grupo:"B",matchday:2},{a:"Estados Unidos",b:"Paraguay",marcador:"4-1",grupo:"D",matchday:1},{a:"Paraguay",b:"Estados Unidos",marcador:"1-4",grupo:"D",matchday:1},{a:"Bélgica",b:"Irán",marcador:"0-0",grupo:"G",matchday:2},{a:"Irán",b:"Nueva Zelanda",marcador:"2-2",grupo:"G",matchday:1},{a:"Estados Unidos",b:"Turquía",marcador:"2-3",grupo:"D",matchday:3},{a:"Turquía",b:"Estados Unidos",marcador:"3-2",grupo:"D",matchday:3}]},
-  {name:"Estadio Atlanta",upcoming:["P95 Octavos: Argentina vs Egipto — 7 jul","Semifinal — 14 de julio"],photo:"Falcons Opening Day - MB Stadium.jpg",alias:"Mercedes-Benz Stadium",city:"Atlanta, GA",country:"Estados Unidos",capacity:75000,opened:2017,note:"Techo retráctil tipo 'pétalo'. Sede de una semifinal.",matches:[{a:"Sudáfrica",b:"Chequia",marcador:"1-1",grupo:"A",matchday:2},{a:"España",b:"Cabo Verde",marcador:"0-0",grupo:"H",matchday:1},{a:"España",b:"Arabia Saudí",marcador:"4-0",grupo:"H",matchday:2},{a:"Arabia Saudí",b:"España",marcador:"0-4",grupo:"H",matchday:2}]},
-  {name:"Estadio Miami",upcoming:["P99 Cuartos: Noruega vs Inglaterra — 11 jul","Partido por el 3er puesto — 18 jul"],photo:"Hard Rock Stadium.jpg",alias:"Hard Rock Stadium",city:"Miami Gardens, FL",country:"Estados Unidos",capacity:65000,opened:1987,note:"Histórica sede de Super Bowls; recibirá el partido por el tercer puesto.",matches:[{a:"Cabo Verde",b:"Uruguay",marcador:"2-2",grupo:"H",matchday:2},{a:"Uruguay",b:"Arabia Saudí",marcador:"1-1",grupo:"H",matchday:1}]},
-  {name:"Estadio Kansas City",upcoming:["P100 Cuartos: Gan.P95 vs Gan.P96 — 11 jul"],photo:"Kansas City Arrowhead Stadium.jpg",alias:"Arrowhead Stadium",city:"Kansas City, MO",country:"Estados Unidos",capacity:76416,opened:1972,note:"Récord Guinness al estadio más ruidoso del mundo.",matches:[{a:"Ecuador",b:"Curazao",marcador:"0-0",grupo:"E",matchday:2},{a:"Argentina",b:"Argelia",marcador:"3-0",grupo:"J",matchday:1},{a:"Argelia",b:"Argentina",marcador:"0-3",grupo:"J",matchday:1},{a:"Países Bajos",b:"Túnez",marcador:"3-1",grupo:"F",matchday:3},{a:"Túnez",b:"Países Bajos",marcador:"1-3",grupo:"F",matchday:3}]},
-  {name:"Estadio Houston",upcoming:[],photo:"Nrgstadium.jpg",alias:"NRG Stadium",city:"Houston, TX",country:"Estados Unidos",capacity:72220,opened:2002,note:"Techo retráctil, uno de los más climatizados del torneo.",matches:[{a:"Alemania",b:"Curazao",marcador:"7-1",grupo:"E",matchday:1},{a:"Curazao",b:"Alemania",marcador:"1-7",grupo:"E",matchday:1},{a:"Países Bajos",b:"Suecia",marcador:"5-1",grupo:"F",matchday:2},{a:"Suecia",b:"Países Bajos",marcador:"1-5",grupo:"F",matchday:2},{a:"Portugal",b:"RD Congo",marcador:"1-1",grupo:"K",matchday:1}]},
-  {name:"Estadio Filadelfia",upcoming:[],photo:"Lincoln Financial Field, Philadelphia.jpg",alias:"Lincoln Financial Field",city:"Philadelphia, PA",country:"Estados Unidos",capacity:69796,opened:2003,note:"Casa de los Philadelphia Eagles (NFL).",matches:[{a:"Brasil",b:"Haití",marcador:"3-0",grupo:"C",matchday:2},{a:"Haití",b:"Brasil",marcador:"0-3",grupo:"C",matchday:2},{a:"Costa de Marfil",b:"Ecuador",marcador:"1-0",grupo:"E",matchday:1},{a:"Ecuador",b:"Costa de Marfil",marcador:"0-1",grupo:"E",matchday:1},{a:"Francia",b:"Irak",marcador:"3-0",grupo:"I",matchday:2},{a:"Irak",b:"Francia",marcador:"0-3",grupo:"I",matchday:2},{a:"Costa de Marfil",b:"Curazao",marcador:"2-0",grupo:"E",matchday:3},{a:"Curazao",b:"Costa de Marfil",marcador:"0-2",grupo:"E",matchday:3}]},
-  {name:"Estadio Boston",upcoming:["P97 Cuartos: Gan.P89 vs Gan.P90 — 9 jul"],photo:"Gillette Stadium.JPG",alias:"Gillette Stadium",city:"Foxborough, MA",country:"Estados Unidos",capacity:64146,opened:2002,note:"En renovación previa al torneo; pantalla gigante de 22.000 pies cuadrados.",matches:[{a:"Marruecos",b:"Escocia",marcador:"1-0",grupo:"C",matchday:2},{a:"Escocia",b:"Haití",marcador:"1-0",grupo:"C",matchday:1},{a:"Escocia",b:"Marruecos",marcador:"0-1",grupo:"C",matchday:2},{a:"Haití",b:"Escocia",marcador:"0-1",grupo:"C",matchday:1},{a:"Noruega",b:"Irak",marcador:"4-1",grupo:"I",matchday:1},{a:"Irak",b:"Noruega",marcador:"1-4",grupo:"I",matchday:1}]},
+  {name:"Estadio Monterrey",upcoming:[],photo:"Mexico Guadalupe Monterrey Estadio BBVA Bancomer fifa world cup 2026 1.JPG",alias:"Estadio BBVA",city:"Guadalupe",country:"México",capacity:53500,opened:2015,note:"Casa de Rayados de Monterrey.",matches:[{a:"Japón",b:"Túnez",marcador:"4-0",grupo:"F",matchday:2},{a:"Suecia",b:"Túnez",marcador:"5-1",grupo:"F",matchday:1},{a:"Túnez",b:"Suecia",marcador:"1-5",grupo:"F",matchday:1},{a:"Túnez",b:"Japón",marcador:"0-4",grupo:"F",matchday:2},{a:"Países Bajos",b:"Marruecos",marcador:"1-1 (2-3p)",fase:"Dieciseisavos"}]},
+  {name:"Estadio Nueva York Nueva Jersey",upcoming:["GRAN FINAL — 19 de julio"],photo:"Metlife stadium.jpg",alias:"MetLife Stadium",city:"East Rutherford, NJ",country:"Estados Unidos",capacity:82500,opened:2010,note:"Sede de la GRAN FINAL del torneo, el 19 de julio.",matches:[{a:"Brasil",b:"Marruecos",marcador:"1-1",grupo:"C",matchday:1},{a:"Francia",b:"Senegal",marcador:"3-1",grupo:"I",matchday:1},{a:"Senegal",b:"Francia",marcador:"1-3",grupo:"I",matchday:1},{a:"Senegal",b:"Noruega",marcador:"2-3",grupo:"I",matchday:2},{a:"Noruega",b:"Senegal",marcador:"3-2",grupo:"I",matchday:2},{a:"Ecuador",b:"Alemania",marcador:"2-1",grupo:"E",matchday:3},{a:"Alemania",b:"Ecuador",marcador:"1-2",grupo:"E",matchday:3},{a:"Francia",b:"Suecia",marcador:"3-0",fase:"Dieciseisavos"},{a:"Brasil",b:"Noruega",marcador:"1-2",fase:"Octavos"}]},
+  {name:"Estadio Dallas",upcoming:["Semifinal — 15 de julio"],photo:"AT&T Stadium Aerial.jpeg",alias:"AT&T Stadium",city:"Arlington, TX",country:"Estados Unidos",capacity:80000,opened:2009,note:"Techo retráctil. La sede con más partidos de todo el Mundial (9 en total).",matches:[{a:"Países Bajos",b:"Japón",marcador:"2-2",grupo:"F",matchday:1},{a:"Argentina",b:"Austria",marcador:"2-0",grupo:"J",matchday:2},{a:"Austria",b:"Argentina",marcador:"0-2",grupo:"J",matchday:2},{a:"Inglaterra",b:"Croacia",marcador:"4-2",grupo:"L",matchday:1},{a:"Croacia",b:"Inglaterra",marcador:"2-4",grupo:"L",matchday:1},{a:"Japón",b:"Suecia",marcador:"1-1",grupo:"F",matchday:3},{a:"Suecia",b:"Japón",marcador:"1-1",grupo:"F",matchday:3},{a:"Costa de Marfil",b:"Noruega",marcador:"1-2",fase:"Dieciseisavos"},{a:"Australia",b:"Egipto",marcador:"1-1 (2-4p)",fase:"Dieciseisavos"},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"},{a:"Portugal",b:"España",marcador:"0-1",fase:"Octavos"}]},
+  {name:"Estadio Los Ángeles",upcoming:["P98 Cuartos: España vs Bélgica — 10 jul"],photo:"SoFi Stadium.jpg",alias:"SoFi Stadium",city:"Inglewood, CA",country:"Estados Unidos",capacity:70000,opened:2020,note:"Uno de los estadios más modernos y caros jamás construidos.",matches:[{a:"Suiza",b:"Bosnia y Herzegovina",marcador:"4-1",grupo:"B",matchday:2},{a:"Bosnia y Herzegovina",b:"Suiza",marcador:"1-4",grupo:"B",matchday:2},{a:"Estados Unidos",b:"Paraguay",marcador:"4-1",grupo:"D",matchday:1},{a:"Paraguay",b:"Estados Unidos",marcador:"1-4",grupo:"D",matchday:1},{a:"Bélgica",b:"Irán",marcador:"0-0",grupo:"G",matchday:2},{a:"Irán",b:"Nueva Zelanda",marcador:"2-2",grupo:"G",matchday:1},{a:"Estados Unidos",b:"Turquía",marcador:"2-3",grupo:"D",matchday:3},{a:"Turquía",b:"Estados Unidos",marcador:"3-2",grupo:"D",matchday:3},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"}]},
+  {name:"Estadio Atlanta",upcoming:["Semifinal — 14 de julio"],photo:"Falcons Opening Day - MB Stadium.jpg",alias:"Mercedes-Benz Stadium",city:"Atlanta, GA",country:"Estados Unidos",capacity:75000,opened:2017,note:"Techo retráctil tipo 'pétalo'. Sede de una semifinal.",matches:[{a:"Sudáfrica",b:"Chequia",marcador:"1-1",grupo:"A",matchday:2},{a:"España",b:"Cabo Verde",marcador:"0-0",grupo:"H",matchday:1},{a:"España",b:"Arabia Saudí",marcador:"4-0",grupo:"H",matchday:2},{a:"Arabia Saudí",b:"España",marcador:"0-4",grupo:"H",matchday:2},{a:"Marruecos",b:"Haití",marcador:"4-2",fase:"Dieciseisavos"},{a:"Inglaterra",b:"RD Congo",marcador:"2-1",fase:"Dieciseisavos"},{a:"Argentina",b:"Egipto",marcador:"3-2",fase:"Octavos"}]},
+  {name:"Estadio Miami",upcoming:["P99 Cuartos: Noruega vs Inglaterra — 11 jul","Partido por el 3er puesto — 18 jul"],photo:"Hard Rock Stadium.jpg",alias:"Hard Rock Stadium",city:"Miami Gardens, FL",country:"Estados Unidos",capacity:65000,opened:1987,note:"Histórica sede de Super Bowls; recibirá el partido por el tercer puesto.",matches:[{a:"Cabo Verde",b:"Uruguay",marcador:"2-2",grupo:"H",matchday:2},{a:"Uruguay",b:"Arabia Saudí",marcador:"1-1",grupo:"H",matchday:1},{a:"Argentina",b:"Cabo Verde",marcador:"3-2 (AET)",fase:"Dieciseisavos"}]},
+  {name:"Estadio Kansas City",upcoming:["P100 Cuartos: Argentina vs Suiza — 11 jul"],photo:"Kansas City Arrowhead Stadium.jpg",alias:"Arrowhead Stadium",city:"Kansas City, MO",country:"Estados Unidos",capacity:76416,opened:1972,note:"Récord Guinness al estadio más ruidoso del mundo.",matches:[{a:"Ecuador",b:"Curazao",marcador:"0-0",grupo:"E",matchday:2},{a:"Argentina",b:"Argelia",marcador:"3-0",grupo:"J",matchday:1},{a:"Argelia",b:"Argentina",marcador:"0-3",grupo:"J",matchday:1},{a:"Países Bajos",b:"Túnez",marcador:"3-1",grupo:"F",matchday:3},{a:"Túnez",b:"Países Bajos",marcador:"1-3",grupo:"F",matchday:3},{a:"Colombia",b:"Ghana",marcador:"1-0",fase:"Dieciseisavos"}]},
+  {name:"Estadio Houston",upcoming:[],photo:"Nrgstadium.jpg",alias:"NRG Stadium",city:"Houston, TX",country:"Estados Unidos",capacity:72220,opened:2002,note:"Techo retráctil, uno de los más climatizados del torneo.",matches:[{a:"Alemania",b:"Curazao",marcador:"7-1",grupo:"E",matchday:1},{a:"Curazao",b:"Alemania",marcador:"1-7",grupo:"E",matchday:1},{a:"Países Bajos",b:"Suecia",marcador:"5-1",grupo:"F",matchday:2},{a:"Suecia",b:"Países Bajos",marcador:"1-5",grupo:"F",matchday:2},{a:"Portugal",b:"RD Congo",marcador:"1-1",grupo:"K",matchday:1},{a:"Brasil",b:"Japón",marcador:"2-1",fase:"Dieciseisavos"},{a:"Canadá",b:"Marruecos",marcador:"0-3",fase:"Octavos"}]},
+  {name:"Estadio Filadelfia",upcoming:[],photo:"Lincoln Financial Field, Philadelphia.jpg",alias:"Lincoln Financial Field",city:"Philadelphia, PA",country:"Estados Unidos",capacity:69796,opened:2003,note:"Casa de los Philadelphia Eagles (NFL).",matches:[{a:"Brasil",b:"Haití",marcador:"3-0",grupo:"C",matchday:2},{a:"Haití",b:"Brasil",marcador:"0-3",grupo:"C",matchday:2},{a:"Costa de Marfil",b:"Ecuador",marcador:"1-0",grupo:"E",matchday:1},{a:"Ecuador",b:"Costa de Marfil",marcador:"0-1",grupo:"E",matchday:1},{a:"Francia",b:"Irak",marcador:"3-0",grupo:"I",matchday:2},{a:"Irak",b:"Francia",marcador:"0-3",grupo:"I",matchday:2},{a:"Costa de Marfil",b:"Curazao",marcador:"2-0",grupo:"E",matchday:3},{a:"Curazao",b:"Costa de Marfil",marcador:"0-2",grupo:"E",matchday:3},{a:"Estados Unidos",b:"Bosnia y Herzegovina",marcador:"2-0",fase:"Dieciseisavos"},{a:"Paraguay",b:"Francia",marcador:"0-1",fase:"Octavos"}]},
+  {name:"Estadio Boston",upcoming:["P97 Cuartos: Francia vs Marruecos — 9 jul"],photo:"Gillette Stadium.JPG",alias:"Gillette Stadium",city:"Foxborough, MA",country:"Estados Unidos",capacity:64146,opened:2002,note:"En renovación previa al torneo; pantalla gigante de 22.000 pies cuadrados.",matches:[{a:"Marruecos",b:"Escocia",marcador:"1-0",grupo:"C",matchday:2},{a:"Escocia",b:"Haití",marcador:"1-0",grupo:"C",matchday:1},{a:"Escocia",b:"Marruecos",marcador:"0-1",grupo:"C",matchday:2},{a:"Haití",b:"Escocia",marcador:"0-1",grupo:"C",matchday:1},{a:"Noruega",b:"Irak",marcador:"4-1",grupo:"I",matchday:1},{a:"Irak",b:"Noruega",marcador:"1-4",grupo:"I",matchday:1},{a:"Alemania",b:"Paraguay",marcador:"1-1 (3-4p)",fase:"Dieciseisavos"},{a:"Francia",b:"Noruega",marcador:"4-1",fase:"Dieciseisavos"}]},
   {name:"Estadio Bahía de San Francisco",upcoming:[],photo:"Levi's Stadium from air.jpg",alias:"Levi's Stadium",city:"Santa Clara, CA",country:"Estados Unidos",capacity:68827,opened:2014,note:"Casa de los San Francisco 49ers (NFL).",matches:[{a:"Suiza",b:"Catar",marcador:"1-1",grupo:"B",matchday:1},{a:"Paraguay",b:"Turquía",marcador:"1-0",grupo:"D",matchday:2},{a:"Turquía",b:"Paraguay",marcador:"0-1",grupo:"D",matchday:2},{a:"Austria",b:"Jordania",marcador:"3-1",grupo:"J",matchday:1},{a:"Jordania",b:"Austria",marcador:"1-3",grupo:"J",matchday:1},{a:"Paraguay",b:"Australia",marcador:"0-0",grupo:"D",matchday:3},{a:"Australia",b:"Paraguay",marcador:"0-0",grupo:"D",matchday:3}]},
-  {name:"Estadio Seattle",upcoming:["P94 Octavos: Estados Unidos vs Bélgica — 6 jul"],photo:"Sounder and CenturyLink Field (14441428905).jpg",alias:"Lumen Field",city:"Seattle, WA",country:"Estados Unidos",capacity:69000,opened:2002,note:"Conocido por la intensidad de su afición.",matches:[{a:"Estados Unidos",b:"Australia",marcador:"2-0",grupo:"D",matchday:2},{a:"Australia",b:"Estados Unidos",marcador:"0-2",grupo:"D",matchday:2},{a:"Bélgica",b:"Egipto",marcador:"1-1",grupo:"G",matchday:1}]},
-  {name:"Estadio Vancouver",upcoming:["P96 Octavos: Suiza vs Colombia — 7 jul"],photo:"BC Place (Vancouver).jpg",alias:"BC Place",city:"Vancouver, BC",country:"Canadá",capacity:54500,opened:1983,note:"Techo retráctil; la sede con más partidos de Canadá.",matches:[{a:"Canadá",b:"Catar",marcador:"6-0",grupo:"B",matchday:2},{a:"Catar",b:"Canadá",marcador:"0-6",grupo:"B",matchday:2},{a:"Australia",b:"Turquía",marcador:"2-0",grupo:"D",matchday:1},{a:"Turquía",b:"Australia",marcador:"0-2",grupo:"D",matchday:1},{a:"Egipto",b:"Nueva Zelanda",marcador:"3-1",grupo:"G",matchday:2},{a:"Nueva Zelanda",b:"Egipto",marcador:"1-3",grupo:"G",matchday:2}]},
-  {name:"Estadio Toronto",upcoming:[],photo:"Toronto - ON - BMO Field.jpg",alias:"BMO Field",city:"Toronto, ON",country:"Canadá",capacity:45000,opened:2007,note:"Ampliado especialmente para el Mundial; debut de Canadá como local.",matches:[{a:"Canadá",b:"Bosnia y Herzegovina",marcador:"1-1",grupo:"B",matchday:1},{a:"Alemania",b:"Costa de Marfil",marcador:"2-1",grupo:"E",matchday:2},{a:"Costa de Marfil",b:"Alemania",marcador:"1-2",grupo:"E",matchday:2},{a:"Ghana",b:"Panamá",marcador:"1-0",grupo:"L",matchday:1},{a:"Panamá",b:"Ghana",marcador:"0-1",grupo:"L",matchday:1}]},
+  {name:"Estadio Seattle",upcoming:[],photo:"Sounder and CenturyLink Field (14441428905).jpg",alias:"Lumen Field",city:"Seattle, WA",country:"Estados Unidos",capacity:69000,opened:2002,note:"Conocido por la intensidad de su afición.",matches:[{a:"Estados Unidos",b:"Australia",marcador:"2-0",grupo:"D",matchday:2},{a:"Australia",b:"Estados Unidos",marcador:"0-2",grupo:"D",matchday:2},{a:"Bélgica",b:"Egipto",marcador:"1-1",grupo:"G",matchday:1},{a:"Bélgica",b:"Senegal",marcador:"3-2 (AET)",fase:"Dieciseisavos"},{a:"Estados Unidos",b:"Bélgica",marcador:"1-4",fase:"Octavos"}]},
+  {name:"Estadio Vancouver",upcoming:[],photo:"BC Place (Vancouver).jpg",alias:"BC Place",city:"Vancouver, BC",country:"Canadá",capacity:54500,opened:1983,note:"Techo retráctil; la sede con más partidos de Canadá.",matches:[{a:"Canadá",b:"Catar",marcador:"6-0",grupo:"B",matchday:2},{a:"Catar",b:"Canadá",marcador:"0-6",grupo:"B",matchday:2},{a:"Australia",b:"Turquía",marcador:"2-0",grupo:"D",matchday:1},{a:"Turquía",b:"Australia",marcador:"0-2",grupo:"D",matchday:1},{a:"Egipto",b:"Nueva Zelanda",marcador:"3-1",grupo:"G",matchday:2},{a:"Nueva Zelanda",b:"Egipto",marcador:"1-3",grupo:"G",matchday:2},{a:"Suiza",b:"Argelia",marcador:"2-0",fase:"Dieciseisavos"},{a:"Suiza",b:"Colombia",marcador:"0-0 (4-3p)",fase:"Octavos"}]},
+  {name:"Estadio Toronto",upcoming:[],photo:"Toronto - ON - BMO Field.jpg",alias:"BMO Field",city:"Toronto, ON",country:"Canadá",capacity:45000,opened:2007,note:"Ampliado especialmente para el Mundial; debut de Canadá como local.",matches:[{a:"Canadá",b:"Bosnia y Herzegovina",marcador:"1-1",grupo:"B",matchday:1},{a:"Alemania",b:"Costa de Marfil",marcador:"2-1",grupo:"E",matchday:2},{a:"Costa de Marfil",b:"Alemania",marcador:"1-2",grupo:"E",matchday:2},{a:"Ghana",b:"Panamá",marcador:"1-0",grupo:"L",matchday:1},{a:"Panamá",b:"Ghana",marcador:"0-1",grupo:"L",matchday:1},{a:"Portugal",b:"Croacia",marcador:"2-1",fase:"Dieciseisavos"}]},
 ];
 // Ilustración SVG propia por estadio (evita depender de fotos externas/rotas)
 function stadiumIllustration(s, idx){
@@ -6365,7 +6510,7 @@ function openStadium(i){
       body += `<div class="stadium-match-row">
         <span class="vs">${flags[m.a]||"🏳️"} ${m.a} <span style="color:var(--muted)">vs</span> ${m.b} ${flags[m.b]||"🏳️"}</span>
         <span class="score" style="color:var(--gold)">${m.marcador}</span>
-        <span class="tag">Grupo ${m.grupo} · Fecha ${m.matchday} · Fase de grupos</span>
+        <span class="tag">${m.fase ? m.fase : `Grupo ${m.grupo} · Fecha ${m.matchday} · Fase de grupos`}</span>
       </div>`;
     });
   }
@@ -6443,12 +6588,14 @@ function renderWorldMap(){
     const mapObj=new Datamap({element:document.getElementById('worldMap'),projection:'mercator',
       fills:fills,data:data,
       geographyConfig:{borderColor:'#0d1117',highlightOnHover:false,
-        popupTemplate:(g,d)=>d?`<div class="hoverinfo" style="background:#111;color:#fff;padding:4px 8px;border-radius:4px">${g.properties.name}: ${MAP_PHASES[d.ph].t}</div>`:''}});
+        popupTemplate:(g,d)=>d?`<div class="hoverinfo" style="background:#111;color:#fff;padding:4px 8px;border-radius:4px">${g.properties.name}: ${MAP_PHASES[d.ph].t}</div>`:''},
+      done:function(dm){ dm.svg.selectAll('.datamaps-subunit').on('click',function(geo){ showMapDetail(geo.id); }); }});
     // Escocia: Datamaps la funde en GBR, la marcamos aparte con un punto
     if(worldCupHistory['Escocia'] && mapObj.latLngToXY){
       const ph=teamPhase('Escocia'), xy=mapObj.latLngToXY(56.8,-4.2);
       mapObj.svg.append('circle').attr('cx',xy[0]).attr('cy',xy[1]).attr('r',5)
-        .style('fill',MAP_PHASES[ph].c).style('stroke','#0d1117').style('stroke-width',1)
+        .style('fill',MAP_PHASES[ph].c).style('stroke','#0d1117').style('stroke-width',1).style('cursor','pointer')
+        .on('click',function(){showMapDetail('_SCO');})
         .append('title').text('Escocia: '+MAP_PHASES[ph].t);
     }
     window._mapDone=true;
@@ -6456,7 +6603,23 @@ function renderWorldMap(){
   document.getElementById('mapLegend').innerHTML=Object.values(MAP_PHASES).map(v=>
     `<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:3px;background:${v.c};display:inline-block"></span>${v.t}</span>`).join('');
 }
-(function(){const o=window.showView||showView;window.showView=function(id){o(id);if(id==='mapa'){setTimeout(renderWorldMap,80);setTimeout(renderWorldMap,400);}};})();
+const ISO_TEAM=Object.fromEntries(Object.entries(MAP_ISO).map(([k,v])=>[v,k]));
+function showMapDetail(iso){
+  const team=iso==='GBR'?'Inglaterra':ISO_TEAM[iso];
+  const box=document.getElementById('mapDetail');
+  if(!team||!teamDetails[team]){ box.innerHTML=''; return; }
+  const d=teamDetails[team], ph=teamPhase(team);
+  const rows=d.matches.map(m=>{
+    const sc=m.marcador, p=sc.split('(')[0].trim().split('-');
+    const col=p.length===2?(+p[0]>+p[1]?'#16a34a':+p[0]===+p[1]?'#a16207':'#b45309'):'#64748b';
+    return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)"><span>vs ${m.rival}</span><b style="color:${col}">${sc}</b></div>`;
+  }).join('');
+  box.innerHTML=`<div class="curio-item" style="padding:14px 16px">
+    <h4 style="margin:0 0 8px;color:var(--gold)">${flags[team]||'🏳️'} ${team} <span style="font-size:.7em;color:var(--muted);font-weight:400">· ${MAP_PHASES[ph].t}</span></h4>
+    ${rows}
+    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(team+' Mundial 2026 recorrido resumen')}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;background:var(--card-hi);border:1px solid var(--gold);color:var(--gold);padding:6px 16px;border-radius:999px;font-size:.8em;text-decoration:none;font-weight:700">▶ Ver recorrido en YouTube</a></div>`;
+}
+(function(){const o=window.showView||showView;window.showView=function(id){o(id);if(id==='mapa'){setTimeout(renderWorldMap,80);setTimeout(renderWorldMap,400);}if(id==='comparar'&&!window._cmpDone){initCompare();window._cmpDone=true;}if(id==='argentina'&&!window._argDone){renderArgSquad();window._argDone=true;}};})();
 </script>
 </body>
 </html>
