@@ -541,6 +541,10 @@
   <div class="note" style="margin-bottom:14px">Un resumen del torneo hasta este corte, calculado automáticamente con todos los partidos cargados.</div>
   <div class="stats-grid" id="statsGrid"></div>
   <div id="statsExtra" style="max-width:900px;margin:20px auto 0"></div>
+  <div style="text-align:center;margin:20px auto 0">
+    <a href="https://es.whoscored.com/regions/247/tournaments/36/seasons/10498/stages/23752/teamstatistics/internacional-fifa-world-cup-2026" target="_blank" rel="noopener" style="display:inline-block;background:var(--card-hi);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:999px;font-size:.82em;text-decoration:none;font-weight:700">📊 Faltas y estadísticas avanzadas por equipo (WhoScored)</a>
+    <div style="font-size:.7em;color:var(--muted);margin-top:6px">Faltas cometidas, posesión, tiros y más, por equipo, actualizado en vivo</div>
+  </div>
   <div class="page-brand">⚽ <b>Chango's Data</b></div>
 </div>
 
@@ -761,8 +765,8 @@ function toggleTheme(){
   document.getElementById('themeToggle').innerText = isLight ? '🌙' : '☀️';
 }
 
-const TODAY_REF = "7 jul";
-const LAST_UPDATE = "7 de julio de 2026 — P95 Argentina 3-2 Egipto · P96 Suiza 0-0 Colombia (4-3 pen.) — ¡Octavos completos!";
+const TODAY_REF = "9 jul";
+const LAST_UPDATE = "9 de julio de 2026 — P97 Francia 2-0 Marruecos (Mbappé y Dembélé): ¡primer semifinalista!";
 document.getElementById('updateBadge').innerHTML = `<span class="dot"></span> Última actualización: ${LAST_UPDATE}`;
 const calendarData = [
 
@@ -771,9 +775,7 @@ const calendarData = [
 
 
 
-  {date:"9 jul", phase:"Cuartos de final", matches:[
-    {p:"P97", a:"Francia",b:"Marruecos",venue:"Estadio Boston"},
-  ]},
+
   {date:"10 jul", phase:"Cuartos de final", matches:[
     {p:"P98", a:"España",b:"Bélgica",venue:"Estadio Los Ángeles"},
   ]},
@@ -781,7 +783,7 @@ const calendarData = [
     {p:"P99", a:"Noruega",b:"Inglaterra",venue:"Estadio Miami"},
     {p:"P100", a:"Argentina",b:"Suiza",venue:"Estadio Kansas City"},
   ]},
-  {date:"14 jul", phase:"Semifinal", matches:[{p:"SF1", a:"Ganador cuadro superior",b:"",venue:"Estadio Atlanta"}]},
+  {date:"14 jul", phase:"Semifinal", matches:[{p:"SF1", a:"Francia",b:"Gan. P98 (España/Bélgica)",venue:"Estadio Atlanta"}]},
   {date:"18 jul", phase:"3er puesto", matches:[{p:"3P", a:"Perdedor SF1",b:"Perdedor SF2",venue:"Estadio Miami"}]},
   {date:"19 jul", phase:"FINAL", matches:[{p:"F", a:"Ganador SF1",b:"Ganador SF2",venue:"Estadio Nueva York Nueva Jersey"}]},
 ];
@@ -1379,6 +1381,12 @@ function openH2H(a,b){
         ▶ Ver resumen del partido en YouTube
       </a>
       <div style="font-size:.68em;color:var(--muted);margin-top:5px">Abre una búsqueda en YouTube del resumen oficial del partido</div>
+      <a href="https://www.google.com/search?q=${encodeURIComponent('site:theanalyst.com '+a+' '+b+' World Cup 2026')}" target="_blank" rel="noopener"
+         style="display:inline-block;margin-top:10px;background:var(--card-hi);border:1px solid var(--line);color:var(--muted);
+                padding:6px 16px;border-radius:999px;font-size:.78em;text-decoration:none;font-weight:700">
+        📈 Análisis de Opta (The Analyst)
+      </a>
+      <div style="font-size:.68em;color:var(--muted);margin-top:5px">Busca el análisis de Opta sobre este partido en theanalyst.com</div>
     </div>`;
   }
   document.getElementById('h2hBody').innerHTML = body;
@@ -1430,6 +1438,10 @@ const R16_RESULTS = {
   P96:{result:'0-0 (4-3p)', winner:'Suiza'},
 };
 const QF_IDS = ['P97','P98','P99','P100'];
+const QF_RESULTS = {
+  P97:{result:'2-0', winner:'Francia'},
+};
+const KO_RESULTS = {0:R16_RESULTS, 1:QF_RESULTS};
 const SF_IDS = ['SF1','SF2'];
 const FINAL_ID = 'P104';
 const THIRD_ID = 'P103';
@@ -1444,7 +1456,7 @@ function buildBracketTree(){
       const childA = prev[j*2], childB = prev[j*2+1];
       const a = childA.played ? childA.winner : null;
       const b = childB.played ? childB.winner : null;
-      const res = (roundIdx===0 && R16_RESULTS[idList[j]]) ? R16_RESULTS[idList[j]] : null;
+      const res = (KO_RESULTS[roundIdx] && KO_RESULTS[roundIdx][idList[j]]) ? KO_RESULTS[roundIdx][idList[j]] : null;
       round.push({id:idList[j], a, b, aLabel: a || `Ganador ${childA.id}`, bLabel: b || `Ganador ${childB.id}`,
         played: !!res, result: res?res.result:undefined, winner: res?res.winner:undefined});
     }
@@ -1787,9 +1799,11 @@ const teamDetails = {
      goles:[["~","⚽ Cody Gakpo (NED)"],["~","⚽ Marruecos (gol del empate, autor s/d)"]],
      tarjetas:[]},
     {rival:"Canadá", marcador:"3-0", estadio:"NRG Stadium, Houston", arbitro:"por confirmar",
-     goles:[], tarjetas:[]}
+     goles:[], tarjetas:[]},
+    {rival:"Francia", marcador:"0-2", estadio:"Gillette Stadium, Boston (Foxborough)", arbitro:"Facundo Tello (ARG)",
+     goles:[], tarjetas:[["~","🟨 Sofyan Diop (MAR)"]]}
   ],
-  matchesNote:"Marruecos golea a Canadá y avanza a cuartos, donde enfrentará a Francia.",
+  matchesNote:"Marruecos queda eliminado por Francia en cuartos, como en Qatar 2022. Bounou atajó un penal a Mbappé.",
   plantel:[["Yassine Bounou","GK"],["Munir El Kajoui","GK"],["Ahmed Reda Tagnaouti","GK"],
    ["Achraf Hakimi","DF"],["Noussair Mazraoui","DF"],["Anass Salah-Eddine","DF"],["Youssef Belammari","DF"],["Nayef Aguerd","DF"],["Issa Diop","DF"],["Chadi Riad","DF"],["Redouane Halhal","DF"],["Zakaria El Ouahdi","DF"],
    ["Azzedine Ounahi","MC"],["Neil El Aynaoui","MC"],["Sofyan Amrabat","MC"],["Ayyoub Bouaddi","MC"],["Samir El Mourabet","MC"],["Bilal El Khannouss","MC"],["Ismael Saibari","MC"],
@@ -2214,9 +2228,11 @@ const teamDetails = {
      goles:[["45'","⚽ Kylian Mbappé (FRA)"],["53'","⚽ Bradley Barcola (FRA)"],["74'","⚽ Kylian Mbappé (FRA)"]],
      tarjetas:[]},
     {rival:"Paraguay", marcador:"1-0", estadio:"Lincoln Financial Field, Filadelfia", arbitro:"por confirmar",
-     goles:[["~","⚽ Kylian Mbappé (FRA)"]], tarjetas:[]}
+     goles:[["~","⚽ Kylian Mbappé (FRA)"]], tarjetas:[]},
+    {rival:"Marruecos", marcador:"2-0", estadio:"Gillette Stadium, Boston (Foxborough)", arbitro:"Facundo Tello (ARG)",
+     goles:[["~","⚽ Kylian Mbappé (FRA)"],["~","⚽ Ousmane Dembélé (FRA)"]], tarjetas:[["~","🟨 Sofyan Diop (MAR)"]]}
   ],
-  matchesNote:"Francia clasifica a cuartos. Mbappé (7 goles) recupera el liderato del Botín de Oro. Enfrentará a Marruecos.",
+  matchesNote:"Francia vence 2-0 a Marruecos y es el primer semifinalista. 6 victorias en 6 partidos. Mbappé erró un penal (atajó Bounou) pero marcó de juego; salió al 75' con una molestia. Enfrentará al ganador de España-Bélgica.",
   plantel:[["Mike Maignan","GK"],["Brice Samba","GK"],["Robin Risser","GK"],
    ["Lucas Digne","DF"],["Malo Gusto","DF"],["Lucas Hernández","DF"],["Theo Hernández","DF"],["Ibrahima Konaté","DF"],["Jules Koundé","DF"],["Maxence Lacroix","DF"],["William Saliba","DF"],["Dayot Upamecano","DF"],
    ["N'Golo Kanté","MC"],["Manu Koné","MC"],["Adrien Rabiot","MC"],["Aurélien Tchouaméni","MC"],["Warren Zaïre-Emery","MC"],
@@ -2811,7 +2827,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:3},{year:1998,rank:1},{year:2002,rank:2},{year:2018,rank:2},{year:2022,rank:1},{year:2026,rank:5}]
 },
 "Marruecos":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1970,
   bestShort:"Semifinales (4º puesto)",
   bestResult:"Semifinales (4º puesto)",
@@ -6095,8 +6111,8 @@ function closePlayer(){document.getElementById('pmodalBg').classList.remove('act
 const scorersRanking = [
   {name:"Lionel Messi",team:"Argentina",photo:"Lionel Messi 20180626.jpg",goals:8,events:[{rival:"Argelia",minute:"17'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Rodrigo De Paul"},{rival:"Argelia",minute:"60'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"sin dato"},{rival:"Argelia",minute:"76'",marcador:"3-0",estadio:"Arrowhead Stadium, Kansas City",asistencia:"Nicolás González"},{rival:"Austria",minute:"38'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"Facundo Medina"},{rival:"Austria",minute:"90+4'",marcador:"2-0",estadio:"AT&T Stadium, Dallas (Arlington)",asistencia:"sin dato"},{rival:"Jordania",minute:"79'",marcador:"3-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Cabo Verde",minute:"29'",marcador:"3-2 AET",estadio:"Hard Rock Stadium, Miami"},{rival:"Egipto",minute:"83'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Erling Haaland",team:"Noruega",photo:"Erling Haaland 2023.jpg",goals:7,events:[{rival:"Irak",minute:"29'",marcador:"4-1",estadio:"Gillette Stadium, Boston (Foxborough)",asistencia:"David Møller Wolfe"},{rival:"Irak",minute:"43'",marcador:"4-1",estadio:"Gillette Stadium, Boston (Foxborough)",asistencia:"sin dato (rebote tras error en salida de Irak)"},{rival:"Senegal",minute:"48'",marcador:"3-2",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Martin Ødegaard"},{rival:"Senegal",minute:"58'",marcador:"3-2",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Patrick Berg"},{rival:"Costa de Marfil",minute:"86'",marcador:"2-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Brasil",minute:"80'",marcador:"2-1",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Brasil",minute:"90+'",marcador:"2-1",estadio:"MetLife Stadium, Nueva Jersey"}]},
-  {name:"Kylian Mbappé",team:"Francia",photo:"Kylian Mbappé France.jpg",goals:7,events:[{rival:"Senegal",minute:"66'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Michael Olise"},{rival:"Senegal",minute:"90+6'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"sin dato (jugada individual)"},{rival:"Irak",minute:"14'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Michael Olise"},{rival:"Irak",minute:"53'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Ousmane Dembélé"},{rival:"Suecia",minute:"45'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Suecia",minute:"74'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Paraguay",minute:"~",marcador:"1-0",estadio:"Lincoln Financial Field, Filadelfia"}]},
-  {name:"Ousmane Dembélé",team:"Francia",photo:"Ousmane Dembélé 2018.jpg",goals:4,events:[{rival:"Irak",minute:"63'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia"},{rival:"Noruega",minute:"7'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"20'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"32'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"}]},
+  {name:"Kylian Mbappé",team:"Francia",photo:"Kylian Mbappé France.jpg",goals:8,events:[{rival:"Senegal",minute:"66'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"Michael Olise"},{rival:"Senegal",minute:"90+6'",marcador:"3-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"sin dato (jugada individual)"},{rival:"Irak",minute:"14'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Michael Olise"},{rival:"Irak",minute:"53'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"Ousmane Dembélé"},{rival:"Suecia",minute:"45'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Suecia",minute:"74'",marcador:"3-0",estadio:"MetLife Stadium, Nueva Jersey"},{rival:"Paraguay",minute:"~",marcador:"1-0",estadio:"Lincoln Financial Field, Filadelfia"},{rival:"Marruecos",minute:"~",marcador:"2-0",estadio:"Gillette Stadium, Boston (Foxborough)"}]},
+  {name:"Ousmane Dembélé",team:"Francia",photo:"Ousmane Dembélé 2018.jpg",goals:5,events:[{rival:"Irak",minute:"63'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia"},{rival:"Noruega",minute:"7'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"20'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"},{rival:"Noruega",minute:"32'",marcador:"4-1",estadio:"Estadio Boston (Foxborough)"}]},
   {name:"Vinícius Júnior",team:"Brasil",photo:"Vinicius Jr 2021.jpg",goals:4,events:[{rival:"Marruecos",minute:"32'",marcador:"1-1",estadio:"MetLife Stadium, Nueva Jersey",asistencia:"sin dato (jugada individual)"},{rival:"Haití",minute:"45+3'",marcador:"3-0",estadio:"Lincoln Financial Field, Filadelfia",asistencia:"sin dato"},{rival:"Escocia",minute:"7'",marcador:"3-0",estadio:"Hard Rock Stadium, Miami",asistencia:"sin asistencia (robo propio tras error rival)"},{rival:"Escocia",minute:"47'",marcador:"3-0",estadio:"Hard Rock Stadium, Miami",asistencia:"sin dato"}]},
   {name:"Brian Brobbey",team:"Países Bajos",goals:3,events:[{rival:"Suecia",minute:"6'",marcador:"5-1",estadio:"NRG Stadium, Houston"},{rival:"Suecia",minute:"16'",marcador:"5-1",estadio:"NRG Stadium, Houston"},{rival:"Túnez",minute:"~",marcador:"3-1",estadio:"Estadio Kansas City"}]},
   {name:"Cody Gakpo",team:"Países Bajos",goals:3,events:[{rival:"Suecia",minute:"48'",marcador:"5-1",estadio:"NRG Stadium, Houston"},{rival:"Suecia",minute:"54'",marcador:"5-1",estadio:"NRG Stadium, Houston"},{rival:"Marruecos",minute:"~",marcador:"1-1 (2-3 pen.)",estadio:"Estadio Monterrey (BBVA)"}]},
@@ -6425,7 +6441,7 @@ const stadiumsData = [
   {name:"Estadio Kansas City",upcoming:["P100 Cuartos: Argentina vs Suiza — 11 jul"],photo:"Kansas City Arrowhead Stadium.jpg",alias:"Arrowhead Stadium",city:"Kansas City, MO",country:"Estados Unidos",capacity:76416,opened:1972,note:"Récord Guinness al estadio más ruidoso del mundo.",matches:[{a:"Ecuador",b:"Curazao",marcador:"0-0",grupo:"E",matchday:2},{a:"Argentina",b:"Argelia",marcador:"3-0",grupo:"J",matchday:1},{a:"Argelia",b:"Argentina",marcador:"0-3",grupo:"J",matchday:1},{a:"Países Bajos",b:"Túnez",marcador:"3-1",grupo:"F",matchday:3},{a:"Túnez",b:"Países Bajos",marcador:"1-3",grupo:"F",matchday:3},{a:"Colombia",b:"Ghana",marcador:"1-0",fase:"Dieciseisavos"}]},
   {name:"Estadio Houston",upcoming:[],photo:"Nrgstadium.jpg",alias:"NRG Stadium",city:"Houston, TX",country:"Estados Unidos",capacity:72220,opened:2002,note:"Techo retráctil, uno de los más climatizados del torneo.",matches:[{a:"Alemania",b:"Curazao",marcador:"7-1",grupo:"E",matchday:1},{a:"Curazao",b:"Alemania",marcador:"1-7",grupo:"E",matchday:1},{a:"Países Bajos",b:"Suecia",marcador:"5-1",grupo:"F",matchday:2},{a:"Suecia",b:"Países Bajos",marcador:"1-5",grupo:"F",matchday:2},{a:"Portugal",b:"RD Congo",marcador:"1-1",grupo:"K",matchday:1},{a:"Brasil",b:"Japón",marcador:"2-1",fase:"Dieciseisavos"},{a:"Canadá",b:"Marruecos",marcador:"0-3",fase:"Octavos"}]},
   {name:"Estadio Filadelfia",upcoming:[],photo:"Lincoln Financial Field, Philadelphia.jpg",alias:"Lincoln Financial Field",city:"Philadelphia, PA",country:"Estados Unidos",capacity:69796,opened:2003,note:"Casa de los Philadelphia Eagles (NFL).",matches:[{a:"Brasil",b:"Haití",marcador:"3-0",grupo:"C",matchday:2},{a:"Haití",b:"Brasil",marcador:"0-3",grupo:"C",matchday:2},{a:"Costa de Marfil",b:"Ecuador",marcador:"1-0",grupo:"E",matchday:1},{a:"Ecuador",b:"Costa de Marfil",marcador:"0-1",grupo:"E",matchday:1},{a:"Francia",b:"Irak",marcador:"3-0",grupo:"I",matchday:2},{a:"Irak",b:"Francia",marcador:"0-3",grupo:"I",matchday:2},{a:"Costa de Marfil",b:"Curazao",marcador:"2-0",grupo:"E",matchday:3},{a:"Curazao",b:"Costa de Marfil",marcador:"0-2",grupo:"E",matchday:3},{a:"Estados Unidos",b:"Bosnia y Herzegovina",marcador:"2-0",fase:"Dieciseisavos"},{a:"Paraguay",b:"Francia",marcador:"0-1",fase:"Octavos"}]},
-  {name:"Estadio Boston",upcoming:["P97 Cuartos: Francia vs Marruecos — 9 jul"],photo:"Gillette Stadium.JPG",alias:"Gillette Stadium",city:"Foxborough, MA",country:"Estados Unidos",capacity:64146,opened:2002,note:"En renovación previa al torneo; pantalla gigante de 22.000 pies cuadrados.",matches:[{a:"Marruecos",b:"Escocia",marcador:"1-0",grupo:"C",matchday:2},{a:"Escocia",b:"Haití",marcador:"1-0",grupo:"C",matchday:1},{a:"Escocia",b:"Marruecos",marcador:"0-1",grupo:"C",matchday:2},{a:"Haití",b:"Escocia",marcador:"0-1",grupo:"C",matchday:1},{a:"Noruega",b:"Irak",marcador:"4-1",grupo:"I",matchday:1},{a:"Irak",b:"Noruega",marcador:"1-4",grupo:"I",matchday:1},{a:"Alemania",b:"Paraguay",marcador:"1-1 (3-4p)",fase:"Dieciseisavos"},{a:"Francia",b:"Noruega",marcador:"4-1",fase:"Dieciseisavos"}]},
+  {name:"Estadio Boston",upcoming:[],photo:"Gillette Stadium.JPG",alias:"Gillette Stadium",city:"Foxborough, MA",country:"Estados Unidos",capacity:64146,opened:2002,note:"En renovación previa al torneo; pantalla gigante de 22.000 pies cuadrados.",matches:[{a:"Marruecos",b:"Escocia",marcador:"1-0",grupo:"C",matchday:2},{a:"Escocia",b:"Haití",marcador:"1-0",grupo:"C",matchday:1},{a:"Escocia",b:"Marruecos",marcador:"0-1",grupo:"C",matchday:2},{a:"Haití",b:"Escocia",marcador:"0-1",grupo:"C",matchday:1},{a:"Noruega",b:"Irak",marcador:"4-1",grupo:"I",matchday:1},{a:"Irak",b:"Noruega",marcador:"1-4",grupo:"I",matchday:1},{a:"Alemania",b:"Paraguay",marcador:"1-1 (3-4p)",fase:"Dieciseisavos"},{a:"Francia",b:"Noruega",marcador:"4-1",fase:"Dieciseisavos"},{a:"Francia",b:"Marruecos",marcador:"2-0",fase:"Cuartos de final"}]},
   {name:"Estadio Bahía de San Francisco",upcoming:[],photo:"Levi's Stadium from air.jpg",alias:"Levi's Stadium",city:"Santa Clara, CA",country:"Estados Unidos",capacity:68827,opened:2014,note:"Casa de los San Francisco 49ers (NFL).",matches:[{a:"Suiza",b:"Catar",marcador:"1-1",grupo:"B",matchday:1},{a:"Paraguay",b:"Turquía",marcador:"1-0",grupo:"D",matchday:2},{a:"Turquía",b:"Paraguay",marcador:"0-1",grupo:"D",matchday:2},{a:"Austria",b:"Jordania",marcador:"3-1",grupo:"J",matchday:1},{a:"Jordania",b:"Austria",marcador:"1-3",grupo:"J",matchday:1},{a:"Paraguay",b:"Australia",marcador:"0-0",grupo:"D",matchday:3},{a:"Australia",b:"Paraguay",marcador:"0-0",grupo:"D",matchday:3}]},
   {name:"Estadio Seattle",upcoming:[],photo:"Sounder and CenturyLink Field (14441428905).jpg",alias:"Lumen Field",city:"Seattle, WA",country:"Estados Unidos",capacity:69000,opened:2002,note:"Conocido por la intensidad de su afición.",matches:[{a:"Estados Unidos",b:"Australia",marcador:"2-0",grupo:"D",matchday:2},{a:"Australia",b:"Estados Unidos",marcador:"0-2",grupo:"D",matchday:2},{a:"Bélgica",b:"Egipto",marcador:"1-1",grupo:"G",matchday:1},{a:"Bélgica",b:"Senegal",marcador:"3-2 (AET)",fase:"Dieciseisavos"},{a:"Estados Unidos",b:"Bélgica",marcador:"1-4",fase:"Octavos"}]},
   {name:"Estadio Vancouver",upcoming:[],photo:"BC Place (Vancouver).jpg",alias:"BC Place",city:"Vancouver, BC",country:"Canadá",capacity:54500,opened:1983,note:"Techo retráctil; la sede con más partidos de Canadá.",matches:[{a:"Canadá",b:"Catar",marcador:"6-0",grupo:"B",matchday:2},{a:"Catar",b:"Canadá",marcador:"0-6",grupo:"B",matchday:2},{a:"Australia",b:"Turquía",marcador:"2-0",grupo:"D",matchday:1},{a:"Turquía",b:"Australia",marcador:"0-2",grupo:"D",matchday:1},{a:"Egipto",b:"Nueva Zelanda",marcador:"3-1",grupo:"G",matchday:2},{a:"Nueva Zelanda",b:"Egipto",marcador:"1-3",grupo:"G",matchday:2},{a:"Suiza",b:"Argelia",marcador:"2-0",fase:"Dieciseisavos"},{a:"Suiza",b:"Colombia",marcador:"0-0 (4-3p)",fase:"Octavos"}]},
