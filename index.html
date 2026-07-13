@@ -765,8 +765,8 @@ function toggleTheme(){
   document.getElementById('themeToggle').innerText = isLight ? '🌙' : '☀️';
 }
 
-const TODAY_REF = "9 jul";
-const LAST_UPDATE = "9 de julio de 2026 — P97 Francia 2-0 Marruecos (Mbappé y Dembélé): ¡primer semifinalista!";
+const TODAY_REF = "12 jul";
+const LAST_UPDATE = "11 de julio de 2026 — Inglaterra 2-1 Noruega (AET, doblete Bellingham) · Argentina 3-1 Suiza (AET): ¡semis definidas!";
 document.getElementById('updateBadge').innerHTML = `<span class="dot"></span> Última actualización: ${LAST_UPDATE}`;
 const calendarData = [
 
@@ -776,14 +776,10 @@ const calendarData = [
 
 
 
-  {date:"10 jul", phase:"Cuartos de final", matches:[
-    {p:"P98", a:"España",b:"Bélgica",venue:"Estadio Los Ángeles"},
-  ]},
-  {date:"11 jul", phase:"Cuartos de final", matches:[
-    {p:"P99", a:"Noruega",b:"Inglaterra",venue:"Estadio Miami"},
-    {p:"P100", a:"Argentina",b:"Suiza",venue:"Estadio Kansas City"},
-  ]},
-  {date:"14 jul", phase:"Semifinal", matches:[{p:"SF1", a:"Francia",b:"Gan. P98 (España/Bélgica)",venue:"Estadio Atlanta"}]},
+
+
+  {date:"14 jul", phase:"Semifinal", matches:[{p:"SF1", a:"Francia",b:"España",venue:"Estadio Dallas"}]},
+  {date:"15 jul", phase:"Semifinal", matches:[{p:"SF2", a:"Argentina",b:"Inglaterra",venue:"Estadio Atlanta"}]},
   {date:"18 jul", phase:"3er puesto", matches:[{p:"3P", a:"Perdedor SF1",b:"Perdedor SF2",venue:"Estadio Miami"}]},
   {date:"19 jul", phase:"FINAL", matches:[{p:"F", a:"Ganador SF1",b:"Ganador SF2",venue:"Estadio Nueva York Nueva Jersey"}]},
 ];
@@ -990,6 +986,15 @@ function renderConfed(){
 
 // ---- Curiosidades del torneo ----
 const curiosidades = [
+  {t:"🇦🇷🏴󠁧󠁢󠁥󠁮󠁧󠁿 Argentina-Inglaterra, el clásico vuelve", d:"La semifinal reedita uno de los duelos más cargados del fútbol: la 'Mano de Dios' y el 'Gol del Siglo' de Maradona en 1986, la expulsión de Beckham en 1998, el penal de Beckham en 2002. Cinco cruces mundialistas previos, dos victorias para cada uno, con el peso extra de Malvinas de fondo."},
+  {t:"⚡ Bellingham, el hombre de los momentos", d:"Doblete ante Noruega (45+2' y 93', el segundo en el alargue) para dar vuelta el partido. Ya le había marcado dos a México en octavos. Con 4 goles, se convirtió en el motor de Inglaterra rumbo a semifinales."},
+  {t:"🥊 Embolo y la expulsión polémica", d:"Con el 1-1 recién conseguido, Breel Embolo vio la segunda amarilla por simulación tras revisión del VAR — el árbitro había amonestado primero a Paredes y revirtió su decisión. Suiza quedó con 10 y Argentina la liquidó en el alargue."},
+  {t:"🌡️ Calor extremo en Miami", d:"El Noruega-Inglaterra se jugó con sensación térmica por encima de los 40°C en el Hard Rock Stadium, con 70.000 personas. Se llegó a evaluar mover el horario. El desgaste se notó: el partido se definió en el alargue."},
+  {t:"🕊️ Minuto de silencio por Jayden Adams", d:"Antes del Noruega-Inglaterra, los jugadores guardaron un minuto de silencio por Jayden Adams, futbolista sudafricano de 25 años que había disputado este Mundial y falleció días atrás."},
+  {t:"🦸 Merino, el héroe inesperado de España", d:"Mikel Merino marcó goles decisivos sobre la hora en octavos (a Portugal, 90+1') y en cuartos (a Bélgica, 88'), llevando a España a su primera semifinal en 16 años. De centrocampista de ida y vuelta pasó a ser el hombre de los goles clave."},
+  {t:"🧤 Courtois se retira llorando", d:"En pleno España-Bélgica, Thibaut Courtois pidió el cambio con molestias y dejó el campo entre lágrimas, consolado por sus compañeros. Su suplente Lammens no pudo blocar el tiro de Cubarsí y el rebote lo aprovechó Merino para el 2-1."},
+  {t:"🇫🇷 Francia, la máquina perfecta", d:"Francia llegó a semifinales con 6 victorias en 6 partidos y sin dar respiro. Mbappé falló un penal ante Marruecos (atajó Bounou) pero igual marcó, aunque preocupa: salió con una molestia en el tobillo pensando en la semi ante España."},
+  {t:"🇪🇸🇫🇷 Semifinal de candidatos", d:"España vs Francia en semifinales enfrenta a las dos mejores selecciones europeas del torneo: la mejor defensa (España, casi imbatida) contra el ataque más letal (Francia, con Mbappé). Revancha de la Eurocopa y la Nations League."},
   {t:"🇨🇭 Suiza, el rey de los penales", d:"Suiza eliminó a Colombia por penales (4-3) tras un 0-0, en un torneo donde las tandas fueron protagonistas. Ya son 8 los partidos de octavos y varios dieciseisavos que se definieron desde los doce pasos en este Mundial."},
   {t:"🐐 Messi lidera el Botín de Oro", d:"Con su gol ante Egipto (remontada 3-2 desde 0-2), Messi llegó a 8 goles y encabeza en solitario la tabla de goleadores, por delante de Mbappé y Haaland (7). A los 38 años, va por su segundo título mundial consecutivo."},
   {t:"🇧🇷 Brasil afuera en octavos por primera vez en 35 años", d:"La eliminación ante Noruega dejó a Brasil sin cuartos de final por primera vez desde Italia 1990. Sumado a las caídas de Alemania y Países Bajos, marca uno de los Mundiales con más potencias eliminadas temprano."},
@@ -1320,6 +1325,8 @@ function renderCalendar(){
 
 // ---- Historial de enfrentamientos + probabilidad estimada (se completa progresivamente) ----
 const headToHead = {
+  "Argentina|Inglaterra":"Uno de los clásicos más cargados de la historia mundialista. Se enfrentaron 5 veces en Copas del Mundo: Inglaterra ganó en 1962 (3-1) y 1966 (1-0, el partido de la expulsión de Rattín); Argentina ganó en 1986 (2-1, con la 'Mano de Dios' y el 'Gol del Siglo' de Maradona) y 1998 (2-2, Argentina por penales, con la expulsión de Beckham); e Inglaterra ganó en 2002 (1-0, penal de Beckham). El cruce está teñido además por la Guerra de Malvinas (1982).",
+  "Francia|España":"Vecinos y candidatos, pero con pocos cruces mundialistas: solo se vieron en el Mundial 2006 (octavos), donde Francia ganó 3-1 con goles de Ribéry, Vieira y Zidane, camino a la final. En torneos continentales se cruzaron muchas más veces, incluida la semifinal de la Eurocopa 2024 (España 2-1) y la Nations League.",
   "México|Chequia": "Se enfrentaron una sola vez en un Mundial: <b>México 3-1 Checoslovaquia</b> (Chile 1962), la primera victoria mundialista en la historia de México. Fuera de Mundiales, Chequia/Checoslovaquia ganó los otros 2 antecedentes (1961 y 2000).",
   "Brasil|Escocia": "4 antecedentes en Mundiales, dominio total de Brasil: empate 0-0 (Alemania 1974), 4-0 (España 1982), 1-0 (Italia 1990, gol agónico de Müller) y 2-1 (Francia 1998). Escocia nunca le ganó a Brasil en una Copa del Mundo.",
 };
@@ -1440,6 +1447,9 @@ const R16_RESULTS = {
 const QF_IDS = ['P97','P98','P99','P100'];
 const QF_RESULTS = {
   P97:{result:'2-0', winner:'Francia'},
+  P98:{result:'2-1', winner:'España'},
+  P99:{result:'1-2 AET', winner:'Inglaterra'},
+  P100:{result:'3-1 AET', winner:'Argentina'},
 };
 const KO_RESULTS = {0:R16_RESULTS, 1:QF_RESULTS};
 const SF_IDS = ['SF1','SF2'];
@@ -1718,9 +1728,11 @@ const teamDetails = {
     {rival:"Argelia", marcador:"2-0", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
      goles:[["10'","⚽ Breel Embolo (SUI)"],["46'","⚽ Dan Ndoye (SUI)"]], tarjetas:[]},
     {rival:"Colombia", marcador:"0-0 (4-3 pen.)", estadio:"BC Place, Vancouver", arbitro:"por confirmar",
-     goles:[], tarjetas:[]}
+     goles:[], tarjetas:[]},
+    {rival:"Argentina", marcador:"1-3 (AET)", estadio:"Arrowhead Stadium, Kansas City", arbitro:"por confirmar",
+     goles:[["67'","⚽ Dan Ndoye (SUI)"]], tarjetas:[["72'","🟥 Breel Embolo (SUI, doble amarilla por simulación)"]]}
   ],
-  matchesNote:"Suiza elimina a Colombia por penales (4-3) y avanza a cuartos. Enfrentará a Argentina el 11 de julio en Kansas City.",
+  matchesNote:"Suiza cae en el alargue ante Argentina, con 10 hombres tras la polémica expulsión de Embolo por simulación.",
   plantel:[["Gregor Kobel","GK"],["Yvon Mvogo","GK"],["Marvin Keller","GK"],
    ["Manuel Akanji","DF"],["Aurèle Amenda","DF"],["Eray Cömert","DF"],["Nico Elvedi","DF"],["Luca Jaquez","DF"],["Miro Muheim","DF"],["Ricardo Rodríguez","DF"],["Silvan Widmer","DF"],
    ["Granit Xhaka","MC"],["Ardon Jashari","MC"],["Denis Zakaria","MC"],["Djibril Sow","MC"],["Michel Aebischer","MC"],["Remo Freuler","MC"],["Fabian Rieder","MC"],["Johan Manzambi","MC"],["Christian Fassnacht","MC"],
@@ -2094,9 +2106,11 @@ const teamDetails = {
      tarjetas:[]},
     {rival:"Estados Unidos", marcador:"4-1", estadio:"Lumen Field, Seattle", arbitro:"Adham Makhadmeh (JOR)",
      goles:[["8'","⚽ Charles De Ketelaere (BEL)"],["32'","⚽ Charles De Ketelaere (BEL)"],["30'","⚽ Malik Tillman (USA)"],
-             ["57'","⚽ Hans Vanaken (BEL)"],["90'","⚽ Romelu Lukaku (BEL)"]], tarjetas:[]}
+             ["57'","⚽ Hans Vanaken (BEL)"],["90'","⚽ Romelu Lukaku (BEL)"]], tarjetas:[]},
+    {rival:"España", marcador:"1-2", estadio:"Estadio Los Ángeles (SoFi)", arbitro:"Michael Oliver (ING)",
+     goles:[["41'","⚽ Charles De Ketelaere (BEL)"]], tarjetas:[]}
   ],
-  matchesNote:"Bélgica golea 4-1 a EEUU con doblete de De Ketelaere y avanza a cuartos. Enfrentará a España.",
+  matchesNote:"Bélgica queda eliminada por España en cuartos. Courtois se retiró lesionado en el segundo tiempo.",
   plantel:[["Thibaut Courtois","GK"],["Senne Lammens","GK"],["Mike Penders","GK"],
    ["Thomas Meunier","DF"],["Axel Witsel","DF"],["Maxim De Cuyper","DF"],["Brandon Mechele","DF"],["Nathan Ngoy","DF"],["Arthur Theate","DF"],["Zeno Debast","DF"],["Wout Faes","DF"],["Timothy Castagne","DF"],
    ["Youri Tielemans","MC"],["Kevin De Bruyne","MC"],["Nicolas Raskin","MC"],["Amadou Onana","MC"],["Orel Mangala","MC"],["Charles De Ketelaere","MC"],
@@ -2170,9 +2184,11 @@ const teamDetails = {
      goles:[["36'","⚽ Mikel Oyarzabal (ESP)"],["66'","⚽ Pedro Porro (ESP, cabezazo)"],["89'","⚽ Mikel Oyarzabal (ESP, doblete)"]],
      tarjetas:[]},
     {rival:"Portugal", marcador:"1-0", estadio:"AT&T Stadium, Dallas", arbitro:"por confirmar",
-     goles:[["90+1'","⚽ Mikel Merino (ESP), asistencia de Ferran Torres"]], tarjetas:[]}
+     goles:[["90+1'","⚽ Mikel Merino (ESP), asistencia de Ferran Torres"]], tarjetas:[]},
+    {rival:"Bélgica", marcador:"2-1", estadio:"Estadio Los Ángeles (SoFi)", arbitro:"Michael Oliver (ING)",
+     goles:[["30'","⚽ Fabián Ruiz (ESP)"],["41'","⚽ Charles De Ketelaere (BEL)"],["88'","⚽ Mikel Merino (ESP)"]], tarjetas:[]}
   ],
-  matchesNote:"España clasifica a cuartos con Merino sobre la hora, sin recibir goles en todo el torneo. Enfrentará a Bélgica.",
+  matchesNote:"España vence 2-1 a Bélgica con doblete anímico de Merino de nuevo decisivo. Alcanza su primera semifinal en 16 años. Enfrentará a Francia.",
   plantel:[["Unai Simón","GK"],["David Raya","GK"],["Joan García","GK"],
    ["Marc Llorente","DF"],["Pedro Porro","DF"],["Eric García","DF"],["Jesús Pubill","DF"],["Aymeric Laporte","DF"],["Pau Cubarsí","DF"],["Marc Cucurella","DF"],["Álex Grimaldo","DF"],
    ["Pedri","MC"],["Fabián Ruiz","MC"],["Martín Zubimendi","MC"],["Gavi","MC"],["Rodri Hernández","MC"],["Álex Baena","MC"],["Mikel Merino","MC"],
@@ -2273,9 +2289,11 @@ const teamDetails = {
      goles:[["~","⚽ Emil Holm (NOR, volea)"],["86'","⚽ Erling Haaland (NOR)"],["~","⚽ Ibrahim Diallo (CIV)"]],
      tarjetas:[]},
     {rival:"Brasil", marcador:"2-1", estadio:"MetLife Stadium, Nueva Jersey", arbitro:"Ismail Elfath (USA)",
-     goles:[["80'","⚽ Erling Haaland (NOR, cabeza)"],["90+","⚽ Erling Haaland (NOR)"]], tarjetas:[]}
+     goles:[["80'","⚽ Erling Haaland (NOR, cabeza)"],["90+","⚽ Erling Haaland (NOR)"]], tarjetas:[]},
+    {rival:"Inglaterra", marcador:"1-2 (AET)", estadio:"Hard Rock Stadium, Miami", arbitro:"Clément Turpin (FRA)",
+     goles:[["36'","⚽ Andreas Schjelderup (NOR), asist. Ødegaard"]], tarjetas:[]}
   ],
-  matchesNote:"Noruega elimina a Brasil y avanza a sus primeros cuartos de final en la historia. Nyland atajó un penal. Enfrentará a Inglaterra.",
+  matchesNote:"Noruega cae en el alargue ante Inglaterra en sus primeros cuartos históricos. Se va con la cabeza alta tras eliminar a Brasil.",
   plantel:[["Ørjan Nyland","GK"],["Egil Selvik","GK"],["Sander Tangvik","GK"],
    ["Julian Ryerson","DF"],["Marcus Holmgren Pedersen","DF"],["David Møller Wolfe","DF"],["Fredrik Bjørkan","DF"],["Kristoffer Ajer","DF"],["Torbjørn Heggem","DF"],["Leo Østigård","DF"],["Sondre Langås","DF"],["Henrik Falchener","DF"],
    ["Martin Ødegaard","MC"],["Sander Berge","MC"],["Fredrik Aursnes","MC"],["Patrick Berg","MC"],["Kristian Thorstvedt","MC"],["Morten Thorsby","MC"],["Thelo Aasgaard","MC"],
@@ -2317,9 +2335,13 @@ const teamDetails = {
     {rival:"Egipto", marcador:"3-2", estadio:"Mercedes-Benz Stadium, Atlanta", arbitro:"por confirmar",
      goles:[["14'","⚽ Yasser Ibrahim (EGY)"],["67'","⚽ Mostafa Zizo (EGY)"],["79'","⚽ Cristian Romero (ARG)"],
              ["83'","⚽ Lionel Messi (ARG)"],["90+","⚽ Enzo Fernández (ARG)"]],
+     tarjetas:[]},
+    {rival:"Suiza", marcador:"3-1 (AET)", estadio:"Arrowhead Stadium, Kansas City", arbitro:"por confirmar",
+     goles:[["10'","⚽ Alexis Mac Allister (ARG, cabeza; asist. Messi de córner)"],["67'","⚽ Dan Ndoye (SUI)"],
+             ["112'","⚽ Julián Álvarez (ARG)"],["120+1'","⚽ Lautaro Martínez (ARG)"]],
      tarjetas:[]}
   ],
-  matchesNote:"Argentina remonta un 0-2 y vence 3-2 a Egipto en Atlanta. Messi erró un penal pero marcó el 2-2. Enfrentará al ganador de Suiza-Colombia. Messi termina como máximo goleador histórico de los Mundiales con 19 goles en su carrera.",
+  matchesNote:"Argentina vence 3-1 a Suiza en el alargue y avanza a semifinales. Mac Allister abrió con asistencia de Messi; Julián Álvarez y Lautaro sentenciaron. Enfrentará a Inglaterra.",
   plantel:[["Emiliano Martínez","GK"],["Gerónimo Rulli","GK"],["Juan Musso","GK"],
    ["Cristian Romero","DF"],["Nicolás Otamendi","DF"],["Lisandro Martínez","DF"],["Nahuel Molina","DF"],["Gonzalo Montiel","DF"],["Nicolás Tagliafico","DF"],["Facundo Medina","DF"],["Marcos Senesi","DF"],
    ["Rodrigo De Paul","MC"],["Leandro Paredes","MC"],["Alexis Mac Allister","MC"],["Enzo Fernández","MC"],["Giovani Lo Celso","MC"],["Exequiel Palacios","MC"],["Valentín Barco","MC"],
@@ -2478,9 +2500,12 @@ const teamDetails = {
      tarjetas:[]},
     {rival:"México", marcador:"3-2", estadio:"Estadio Ciudad de México (Azteca)", arbitro:"por confirmar",
      goles:[["~","⚽ Jude Bellingham (ENG)"],["~","⚽ Jude Bellingham (ENG)"],["59'","⚽ Harry Kane (ENG, penal)"]],
-     tarjetas:[["53'","🟥 Jarell Quansah (ENG)"]]}
+     tarjetas:[["53'","🟥 Jarell Quansah (ENG)"]]},
+    {rival:"Noruega", marcador:"2-1 (AET)", estadio:"Hard Rock Stadium, Miami", arbitro:"Clément Turpin (FRA)",
+     goles:[["36'","⚽ Andreas Schjelderup (NOR)"],["45+2'","⚽ Jude Bellingham (ENG), asist. Anthony Gordon"],["93'","⚽ Jude Bellingham (ENG)"]],
+     tarjetas:[]}
   ],
-  matchesNote:"Inglaterra elimina a México y avanza a cuartos, donde enfrentará a Noruega. Kane suma 6 goles.",
+  matchesNote:"Inglaterra vence 2-1 a Noruega en el alargue con doblete de Bellingham y vuelve a semifinales tras 8 años. Enfrentará a Argentina.",
   plantel:[["Jordan Pickford","GK"],["James Trafford","GK"],["Dean Henderson","GK"],
    ["Dan Burn","DF"],["Marc Guéhi","DF"],["Reece James","DF"],["Ezri Konsa","DF"],["Tino Livramento","DF"],["Nico O'Reilly","DF"],["Jarell Quansah","DF"],["Djed Spence","DF"],["John Stones","DF"],
    ["Elliot Anderson","MC"],["Jude Bellingham","MC"],["Eberechi Eze","MC"],["Jordan Henderson","MC"],["Kobbie Mainoo","MC"],["Declan Rice","MC"],["Morgan Rogers","MC"],
@@ -2751,7 +2776,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:54},{year:1998,rank:74},{year:2002,rank:75},{year:2018,rank:79},{year:2026,rank:48}]
 },
 "Suiza":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1934,
   bestShort:"Cuartos de final",
   bestResult:"Cuartos de final",
@@ -3082,7 +3107,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:30},{year:1998,rank:26},{year:2002,rank:31},{year:2018,rank:21},{year:2026,rank:45}]
 },
 "Bélgica":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1930,
   bestShort:"Tercer puesto",
   bestResult:"Tercer puesto",
@@ -3262,7 +3287,7 @@ const worldCupHistory = {
   rankAtWC:[{year:1994,rank:55},{year:2002,rank:42},{year:2018,rank:27},{year:2026,rank:12}]
 },
 "Noruega":{
-  qualified2026:true,
+  eliminated2026:true,
   first:1938,
   bestShort:"Octavos de final",
   bestResult:"Octavos de final",
@@ -6131,15 +6156,20 @@ const scorersRanking = [
   {name:"Brian Cipenga",team:"RD Congo",goals:1,events:[{rival:"Inglaterra",minute:"7'",marcador:"1-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Ismael Saibari",team:"Marruecos",goals:2,events:[{rival:"Escocia",minute:"1'",marcador:"1-0",estadio:"Gillette Stadium, Boston (Foxborough)"},{rival:"Haití",minute:"~",marcador:"4-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Johan Manzambi",team:"Suiza",goals:2,events:[{rival:"Bosnia y Herzegovina",minute:"74'",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"},{rival:"Bosnia y Herzegovina",minute:"~",marcador:"4-1",estadio:"SoFi Stadium, Los Ángeles"}]},
-  {name:"Jude Bellingham",team:"Inglaterra",goals:2,events:[{rival:"Croacia",minute:"47'",marcador:"4-2",estadio:"Estadio Dallas (Arlington)"},{rival:"Panamá",minute:"62'",marcador:"2-0",estadio:"Estadio Nueva York Nueva Jersey"}]},
+  {name:"Jude Bellingham",team:"Inglaterra",photo:"Jude Bellingham 2023.jpg",goals:4,events:[{rival:"Croacia",minute:"47'",marcador:"4-2",estadio:"Estadio Dallas (Arlington)"},{rival:"Panamá",minute:"62'",marcador:"2-0",estadio:"Estadio Nueva York Nueva Jersey"},{rival:"Noruega",minute:"45+2'",marcador:"2-1 AET",estadio:"Hard Rock Stadium, Miami"},{rival:"Noruega",minute:"93'",marcador:"2-1 AET",estadio:"Hard Rock Stadium, Miami"}]},
   {name:"Jude Bellingham",team:"Inglaterra",goals:2,events:[{rival:"México",minute:"~",marcador:"3-2",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"México",minute:"~",marcador:"3-2",estadio:"Estadio Ciudad de México (Azteca)"}]},
-  {name:"Charles De Ketelaere",team:"Bélgica",goals:2,events:[{rival:"Estados Unidos",minute:"8'",marcador:"4-1",estadio:"Lumen Field, Seattle"},{rival:"Estados Unidos",minute:"32'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
-  {name:"Mikel Merino",team:"España",goals:1,events:[{rival:"Portugal",minute:"90+1'",marcador:"1-0",estadio:"AT&T Stadium, Dallas"}]},
+  {name:"Charles De Ketelaere",team:"Bélgica",goals:3,events:[{rival:"Estados Unidos",minute:"8'",marcador:"4-1",estadio:"Lumen Field, Seattle"},{rival:"Estados Unidos",minute:"32'",marcador:"4-1",estadio:"Lumen Field, Seattle"},{rival:"España",minute:"41'",marcador:"1-2",estadio:"Estadio Los Ángeles (SoFi)"}]},
+  {name:"Mikel Merino",team:"España",goals:2,events:[{rival:"Portugal",minute:"90+1'",marcador:"1-0",estadio:"AT&T Stadium, Dallas"},{rival:"Bélgica",minute:"88'",marcador:"2-1",estadio:"Estadio Los Ángeles (SoFi)"}]},
   {name:"Hans Vanaken",team:"Bélgica",goals:1,events:[{rival:"Estados Unidos",minute:"57'",marcador:"4-1",estadio:"Lumen Field, Seattle"}]},
   {name:"Cristian Romero",team:"Argentina",goals:1,events:[{rival:"Egipto",minute:"79'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Enzo Fernández",team:"Argentina",goals:1,events:[{rival:"Egipto",minute:"90+'",marcador:"3-2",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Yasser Ibrahim",team:"Egipto",goals:1,events:[{rival:"Argentina",minute:"14'",marcador:"2-3",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
   {name:"Mostafa Zizo",team:"Egipto",goals:1,events:[{rival:"Argentina",minute:"67'",marcador:"2-3",estadio:"Mercedes-Benz Stadium, Atlanta"}]},
+  {name:"Fabián Ruiz",team:"España",goals:1,events:[{rival:"Bélgica",minute:"30'",marcador:"2-1",estadio:"Estadio Los Ángeles (SoFi)"}]},
+  {name:"Alexis Mac Allister",team:"Argentina",goals:1,events:[{rival:"Suiza",minute:"10'",marcador:"3-1 AET",estadio:"Arrowhead Stadium, Kansas City"}]},
+  {name:"Julián Álvarez",team:"Argentina",goals:1,events:[{rival:"Suiza",minute:"112'",marcador:"3-1 AET",estadio:"Arrowhead Stadium, Kansas City"}]},
+  {name:"Andreas Schjelderup",team:"Noruega",goals:1,events:[{rival:"Inglaterra",minute:"36'",marcador:"1-2 AET",estadio:"Hard Rock Stadium, Miami"}]},
+  {name:"Dan Ndoye",team:"Suiza",goals:1,events:[{rival:"Argentina",minute:"67'",marcador:"1-3 AET",estadio:"Arrowhead Stadium, Kansas City"}]},
   {name:"Jhon Arias",team:"Colombia",goals:1,events:[{rival:"Ghana",minute:"14'",marcador:"1-0",estadio:"Arrowhead Stadium, Kansas City"}]},
   {name:"Julián Quiñones",team:"México",photo:"Julián Quiñones.png",goals:4,events:[{rival:"Sudáfrica",minute:"9'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Chequia",minute:"~",marcador:"3-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Ecuador",minute:"22'",marcador:"2-0",estadio:"Estadio Ciudad de México (Azteca)"},{rival:"Inglaterra",minute:"~42'",marcador:"2-3",estadio:"Estadio Ciudad de México (Azteca)"}]},
   {name:"Kai Havertz",team:"Alemania",goals:2,events:[{rival:"Curazao",minute:"45+5'",marcador:"7-1",estadio:"NRG Stadium, Houston"},{rival:"Curazao",minute:"88'",marcador:"7-1",estadio:"NRG Stadium, Houston"}]},
@@ -6187,7 +6217,7 @@ const scorersRanking = [
   {name:"Kerim Alajbegović",team:"Bosnia y Herzegovina",goals:1,events:[{rival:"Catar",minute:"29'",marcador:"3-1",estadio:"Estadio de Seattle"}]},
   {name:"Kevin De Bruyne",team:"Bélgica",goals:1,events:[{rival:"Nueva Zelanda",minute:"66'",marcador:"5-1",estadio:"BC Place, Vancouver"}]},
   {name:"Lamine Yamal",team:"España",goals:1,events:[{rival:"Arabia Saudí",minute:"10'",marcador:"4-0",estadio:"Estadio de Atlanta (Mercedes-Benz)"}]},
-  {name:"Lautaro Martínez",team:"Argentina",goals:1,events:[{rival:"Jordania",minute:"18'",marcador:"3-1",estadio:"Estadio Dallas (Arlington)"}]},
+  {name:"Lautaro Martínez",team:"Argentina",goals:2,events:[{rival:"Jordania",minute:"18'",marcador:"3-1",estadio:"Estadio Dallas (Arlington)"},{rival:"Suiza",minute:"120+1'",marcador:"3-1 AET",estadio:"Arrowhead Stadium, Kansas City"}]},
   {name:"Leo Østigård",team:"Noruega",goals:1,events:[{rival:"Irak",minute:"76'",marcador:"4-1",estadio:"Gillette Stadium, Boston (Foxborough)"}]},
   {name:"Livano Comenencia",team:"Curazao",goals:1,events:[{rival:"Alemania",minute:"21'",marcador:"1-7",estadio:"NRG Stadium, Houston"}]},
   {name:"Luis Díaz",team:"Colombia",goals:1,events:[{rival:"Uzbekistán",minute:"65'",marcador:"3-1",estadio:"Estadio Ciudad de México (Azteca)"}]},
@@ -6434,11 +6464,11 @@ const stadiumsData = [
   {name:"Estadio Guadalajara",upcoming:[],photo:"Estadio Omnilife Chivas.jpg",alias:"Estadio Akron",city:"Zapopan",country:"México",capacity:49850,opened:2010,note:"Casa de Chivas, en el área metropolitana de Guadalajara.",matches:[{a:"México",b:"Corea del Sur",marcador:"1-0",grupo:"A",matchday:2},{a:"Corea del Sur",b:"Chequia",marcador:"2-1",grupo:"A",matchday:1},{a:"Corea del Sur",b:"México",marcador:"0-1",grupo:"A",matchday:2},{a:"Chequia",b:"Corea del Sur",marcador:"1-2",grupo:"A",matchday:1}]},
   {name:"Estadio Monterrey",upcoming:[],photo:"Mexico Guadalupe Monterrey Estadio BBVA Bancomer fifa world cup 2026 1.JPG",alias:"Estadio BBVA",city:"Guadalupe",country:"México",capacity:53500,opened:2015,note:"Casa de Rayados de Monterrey.",matches:[{a:"Japón",b:"Túnez",marcador:"4-0",grupo:"F",matchday:2},{a:"Suecia",b:"Túnez",marcador:"5-1",grupo:"F",matchday:1},{a:"Túnez",b:"Suecia",marcador:"1-5",grupo:"F",matchday:1},{a:"Túnez",b:"Japón",marcador:"0-4",grupo:"F",matchday:2},{a:"Países Bajos",b:"Marruecos",marcador:"1-1 (2-3p)",fase:"Dieciseisavos"}]},
   {name:"Estadio Nueva York Nueva Jersey",upcoming:["GRAN FINAL — 19 de julio"],photo:"Metlife stadium.jpg",alias:"MetLife Stadium",city:"East Rutherford, NJ",country:"Estados Unidos",capacity:82500,opened:2010,note:"Sede de la GRAN FINAL del torneo, el 19 de julio.",matches:[{a:"Brasil",b:"Marruecos",marcador:"1-1",grupo:"C",matchday:1},{a:"Francia",b:"Senegal",marcador:"3-1",grupo:"I",matchday:1},{a:"Senegal",b:"Francia",marcador:"1-3",grupo:"I",matchday:1},{a:"Senegal",b:"Noruega",marcador:"2-3",grupo:"I",matchday:2},{a:"Noruega",b:"Senegal",marcador:"3-2",grupo:"I",matchday:2},{a:"Ecuador",b:"Alemania",marcador:"2-1",grupo:"E",matchday:3},{a:"Alemania",b:"Ecuador",marcador:"1-2",grupo:"E",matchday:3},{a:"Francia",b:"Suecia",marcador:"3-0",fase:"Dieciseisavos"},{a:"Brasil",b:"Noruega",marcador:"1-2",fase:"Octavos"}]},
-  {name:"Estadio Dallas",upcoming:["Semifinal — 15 de julio"],photo:"AT&T Stadium Aerial.jpeg",alias:"AT&T Stadium",city:"Arlington, TX",country:"Estados Unidos",capacity:80000,opened:2009,note:"Techo retráctil. La sede con más partidos de todo el Mundial (9 en total).",matches:[{a:"Países Bajos",b:"Japón",marcador:"2-2",grupo:"F",matchday:1},{a:"Argentina",b:"Austria",marcador:"2-0",grupo:"J",matchday:2},{a:"Austria",b:"Argentina",marcador:"0-2",grupo:"J",matchday:2},{a:"Inglaterra",b:"Croacia",marcador:"4-2",grupo:"L",matchday:1},{a:"Croacia",b:"Inglaterra",marcador:"2-4",grupo:"L",matchday:1},{a:"Japón",b:"Suecia",marcador:"1-1",grupo:"F",matchday:3},{a:"Suecia",b:"Japón",marcador:"1-1",grupo:"F",matchday:3},{a:"Costa de Marfil",b:"Noruega",marcador:"1-2",fase:"Dieciseisavos"},{a:"Australia",b:"Egipto",marcador:"1-1 (2-4p)",fase:"Dieciseisavos"},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"},{a:"Portugal",b:"España",marcador:"0-1",fase:"Octavos"}]},
-  {name:"Estadio Los Ángeles",upcoming:["P98 Cuartos: España vs Bélgica — 10 jul"],photo:"SoFi Stadium.jpg",alias:"SoFi Stadium",city:"Inglewood, CA",country:"Estados Unidos",capacity:70000,opened:2020,note:"Uno de los estadios más modernos y caros jamás construidos.",matches:[{a:"Suiza",b:"Bosnia y Herzegovina",marcador:"4-1",grupo:"B",matchday:2},{a:"Bosnia y Herzegovina",b:"Suiza",marcador:"1-4",grupo:"B",matchday:2},{a:"Estados Unidos",b:"Paraguay",marcador:"4-1",grupo:"D",matchday:1},{a:"Paraguay",b:"Estados Unidos",marcador:"1-4",grupo:"D",matchday:1},{a:"Bélgica",b:"Irán",marcador:"0-0",grupo:"G",matchday:2},{a:"Irán",b:"Nueva Zelanda",marcador:"2-2",grupo:"G",matchday:1},{a:"Estados Unidos",b:"Turquía",marcador:"2-3",grupo:"D",matchday:3},{a:"Turquía",b:"Estados Unidos",marcador:"3-2",grupo:"D",matchday:3},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"}]},
-  {name:"Estadio Atlanta",upcoming:["Semifinal — 14 de julio"],photo:"Falcons Opening Day - MB Stadium.jpg",alias:"Mercedes-Benz Stadium",city:"Atlanta, GA",country:"Estados Unidos",capacity:75000,opened:2017,note:"Techo retráctil tipo 'pétalo'. Sede de una semifinal.",matches:[{a:"Sudáfrica",b:"Chequia",marcador:"1-1",grupo:"A",matchday:2},{a:"España",b:"Cabo Verde",marcador:"0-0",grupo:"H",matchday:1},{a:"España",b:"Arabia Saudí",marcador:"4-0",grupo:"H",matchday:2},{a:"Arabia Saudí",b:"España",marcador:"0-4",grupo:"H",matchday:2},{a:"Marruecos",b:"Haití",marcador:"4-2",fase:"Dieciseisavos"},{a:"Inglaterra",b:"RD Congo",marcador:"2-1",fase:"Dieciseisavos"},{a:"Argentina",b:"Egipto",marcador:"3-2",fase:"Octavos"}]},
-  {name:"Estadio Miami",upcoming:["P99 Cuartos: Noruega vs Inglaterra — 11 jul","Partido por el 3er puesto — 18 jul"],photo:"Hard Rock Stadium.jpg",alias:"Hard Rock Stadium",city:"Miami Gardens, FL",country:"Estados Unidos",capacity:65000,opened:1987,note:"Histórica sede de Super Bowls; recibirá el partido por el tercer puesto.",matches:[{a:"Cabo Verde",b:"Uruguay",marcador:"2-2",grupo:"H",matchday:2},{a:"Uruguay",b:"Arabia Saudí",marcador:"1-1",grupo:"H",matchday:1},{a:"Argentina",b:"Cabo Verde",marcador:"3-2 (AET)",fase:"Dieciseisavos"}]},
-  {name:"Estadio Kansas City",upcoming:["P100 Cuartos: Argentina vs Suiza — 11 jul"],photo:"Kansas City Arrowhead Stadium.jpg",alias:"Arrowhead Stadium",city:"Kansas City, MO",country:"Estados Unidos",capacity:76416,opened:1972,note:"Récord Guinness al estadio más ruidoso del mundo.",matches:[{a:"Ecuador",b:"Curazao",marcador:"0-0",grupo:"E",matchday:2},{a:"Argentina",b:"Argelia",marcador:"3-0",grupo:"J",matchday:1},{a:"Argelia",b:"Argentina",marcador:"0-3",grupo:"J",matchday:1},{a:"Países Bajos",b:"Túnez",marcador:"3-1",grupo:"F",matchday:3},{a:"Túnez",b:"Países Bajos",marcador:"1-3",grupo:"F",matchday:3},{a:"Colombia",b:"Ghana",marcador:"1-0",fase:"Dieciseisavos"}]},
+  {name:"Estadio Dallas",upcoming:["SF1: Francia vs España — 14 jul"],photo:"AT&T Stadium Aerial.jpeg",alias:"AT&T Stadium",city:"Arlington, TX",country:"Estados Unidos",capacity:80000,opened:2009,note:"Techo retráctil. La sede con más partidos de todo el Mundial (9 en total).",matches:[{a:"Países Bajos",b:"Japón",marcador:"2-2",grupo:"F",matchday:1},{a:"Argentina",b:"Austria",marcador:"2-0",grupo:"J",matchday:2},{a:"Austria",b:"Argentina",marcador:"0-2",grupo:"J",matchday:2},{a:"Inglaterra",b:"Croacia",marcador:"4-2",grupo:"L",matchday:1},{a:"Croacia",b:"Inglaterra",marcador:"2-4",grupo:"L",matchday:1},{a:"Japón",b:"Suecia",marcador:"1-1",grupo:"F",matchday:3},{a:"Suecia",b:"Japón",marcador:"1-1",grupo:"F",matchday:3},{a:"Costa de Marfil",b:"Noruega",marcador:"1-2",fase:"Dieciseisavos"},{a:"Australia",b:"Egipto",marcador:"1-1 (2-4p)",fase:"Dieciseisavos"},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"},{a:"Portugal",b:"España",marcador:"0-1",fase:"Octavos"}]},
+  {name:"Estadio Los Ángeles",upcoming:[],photo:"SoFi Stadium.jpg",alias:"SoFi Stadium",city:"Inglewood, CA",country:"Estados Unidos",capacity:70000,opened:2020,note:"Uno de los estadios más modernos y caros jamás construidos.",matches:[{a:"Suiza",b:"Bosnia y Herzegovina",marcador:"4-1",grupo:"B",matchday:2},{a:"Bosnia y Herzegovina",b:"Suiza",marcador:"1-4",grupo:"B",matchday:2},{a:"Estados Unidos",b:"Paraguay",marcador:"4-1",grupo:"D",matchday:1},{a:"Paraguay",b:"Estados Unidos",marcador:"1-4",grupo:"D",matchday:1},{a:"Bélgica",b:"Irán",marcador:"0-0",grupo:"G",matchday:2},{a:"Irán",b:"Nueva Zelanda",marcador:"2-2",grupo:"G",matchday:1},{a:"Estados Unidos",b:"Turquía",marcador:"2-3",grupo:"D",matchday:3},{a:"Turquía",b:"Estados Unidos",marcador:"3-2",grupo:"D",matchday:3},{a:"España",b:"Austria",marcador:"3-0",fase:"Dieciseisavos"},{a:"España",b:"Bélgica",marcador:"2-1",fase:"Cuartos de final"}]},
+  {name:"Estadio Atlanta",upcoming:["SF2: Argentina vs Inglaterra — 15 jul"],photo:"Falcons Opening Day - MB Stadium.jpg",alias:"Mercedes-Benz Stadium",city:"Atlanta, GA",country:"Estados Unidos",capacity:75000,opened:2017,note:"Techo retráctil tipo 'pétalo'. Sede de una semifinal.",matches:[{a:"Sudáfrica",b:"Chequia",marcador:"1-1",grupo:"A",matchday:2},{a:"España",b:"Cabo Verde",marcador:"0-0",grupo:"H",matchday:1},{a:"España",b:"Arabia Saudí",marcador:"4-0",grupo:"H",matchday:2},{a:"Arabia Saudí",b:"España",marcador:"0-4",grupo:"H",matchday:2},{a:"Marruecos",b:"Haití",marcador:"4-2",fase:"Dieciseisavos"},{a:"Inglaterra",b:"RD Congo",marcador:"2-1",fase:"Dieciseisavos"},{a:"Argentina",b:"Egipto",marcador:"3-2",fase:"Octavos"}]},
+  {name:"Estadio Miami",upcoming:["Partido por el 3er puesto — 18 jul"],photo:"Hard Rock Stadium.jpg",alias:"Hard Rock Stadium",city:"Miami Gardens, FL",country:"Estados Unidos",capacity:65000,opened:1987,note:"Histórica sede de Super Bowls; recibirá el partido por el tercer puesto.",matches:[{a:"Cabo Verde",b:"Uruguay",marcador:"2-2",grupo:"H",matchday:2},{a:"Uruguay",b:"Arabia Saudí",marcador:"1-1",grupo:"H",matchday:1},{a:"Argentina",b:"Cabo Verde",marcador:"3-2 (AET)",fase:"Dieciseisavos"},{a:"Noruega",b:"Inglaterra",marcador:"1-2 (AET)",fase:"Cuartos de final"}]},
+  {name:"Estadio Kansas City",upcoming:[],photo:"Kansas City Arrowhead Stadium.jpg",alias:"Arrowhead Stadium",city:"Kansas City, MO",country:"Estados Unidos",capacity:76416,opened:1972,note:"Récord Guinness al estadio más ruidoso del mundo.",matches:[{a:"Ecuador",b:"Curazao",marcador:"0-0",grupo:"E",matchday:2},{a:"Argentina",b:"Argelia",marcador:"3-0",grupo:"J",matchday:1},{a:"Argelia",b:"Argentina",marcador:"0-3",grupo:"J",matchday:1},{a:"Países Bajos",b:"Túnez",marcador:"3-1",grupo:"F",matchday:3},{a:"Túnez",b:"Países Bajos",marcador:"1-3",grupo:"F",matchday:3},{a:"Colombia",b:"Ghana",marcador:"1-0",fase:"Dieciseisavos"},{a:"Argentina",b:"Suiza",marcador:"3-1 (AET)",fase:"Cuartos de final"}]},
   {name:"Estadio Houston",upcoming:[],photo:"Nrgstadium.jpg",alias:"NRG Stadium",city:"Houston, TX",country:"Estados Unidos",capacity:72220,opened:2002,note:"Techo retráctil, uno de los más climatizados del torneo.",matches:[{a:"Alemania",b:"Curazao",marcador:"7-1",grupo:"E",matchday:1},{a:"Curazao",b:"Alemania",marcador:"1-7",grupo:"E",matchday:1},{a:"Países Bajos",b:"Suecia",marcador:"5-1",grupo:"F",matchday:2},{a:"Suecia",b:"Países Bajos",marcador:"1-5",grupo:"F",matchday:2},{a:"Portugal",b:"RD Congo",marcador:"1-1",grupo:"K",matchday:1},{a:"Brasil",b:"Japón",marcador:"2-1",fase:"Dieciseisavos"},{a:"Canadá",b:"Marruecos",marcador:"0-3",fase:"Octavos"}]},
   {name:"Estadio Filadelfia",upcoming:[],photo:"Lincoln Financial Field, Philadelphia.jpg",alias:"Lincoln Financial Field",city:"Philadelphia, PA",country:"Estados Unidos",capacity:69796,opened:2003,note:"Casa de los Philadelphia Eagles (NFL).",matches:[{a:"Brasil",b:"Haití",marcador:"3-0",grupo:"C",matchday:2},{a:"Haití",b:"Brasil",marcador:"0-3",grupo:"C",matchday:2},{a:"Costa de Marfil",b:"Ecuador",marcador:"1-0",grupo:"E",matchday:1},{a:"Ecuador",b:"Costa de Marfil",marcador:"0-1",grupo:"E",matchday:1},{a:"Francia",b:"Irak",marcador:"3-0",grupo:"I",matchday:2},{a:"Irak",b:"Francia",marcador:"0-3",grupo:"I",matchday:2},{a:"Costa de Marfil",b:"Curazao",marcador:"2-0",grupo:"E",matchday:3},{a:"Curazao",b:"Costa de Marfil",marcador:"0-2",grupo:"E",matchday:3},{a:"Estados Unidos",b:"Bosnia y Herzegovina",marcador:"2-0",fase:"Dieciseisavos"},{a:"Paraguay",b:"Francia",marcador:"0-1",fase:"Octavos"}]},
   {name:"Estadio Boston",upcoming:[],photo:"Gillette Stadium.JPG",alias:"Gillette Stadium",city:"Foxborough, MA",country:"Estados Unidos",capacity:64146,opened:2002,note:"En renovación previa al torneo; pantalla gigante de 22.000 pies cuadrados.",matches:[{a:"Marruecos",b:"Escocia",marcador:"1-0",grupo:"C",matchday:2},{a:"Escocia",b:"Haití",marcador:"1-0",grupo:"C",matchday:1},{a:"Escocia",b:"Marruecos",marcador:"0-1",grupo:"C",matchday:2},{a:"Haití",b:"Escocia",marcador:"0-1",grupo:"C",matchday:1},{a:"Noruega",b:"Irak",marcador:"4-1",grupo:"I",matchday:1},{a:"Irak",b:"Noruega",marcador:"1-4",grupo:"I",matchday:1},{a:"Alemania",b:"Paraguay",marcador:"1-1 (3-4p)",fase:"Dieciseisavos"},{a:"Francia",b:"Noruega",marcador:"4-1",fase:"Dieciseisavos"},{a:"Francia",b:"Marruecos",marcador:"2-0",fase:"Cuartos de final"}]},
